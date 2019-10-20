@@ -1,10 +1,10 @@
-#ifndef _WAYLAND_WINDOW_H_
-#define _WAYLAND_WINDOW_H_
+#ifndef _WAYLAND_CLIENT_H_
+#define _WAYLAND_CLIENT_H_
 
 #include <wayland-client.h>
 #include "../types.h"
 
-struct wayland_window {
+struct wayland_client {
   /**
    * The root global object is the display object.
    * It represents the connection to the display server.
@@ -19,14 +19,14 @@ struct wayland_window {
     struct wl_shm* shared_memory;
 };
 
-struct wayland_window*
+struct wayland_client*
 wayland_create();
 
 bool
 wayland_listen(struct wl_display* display);
 
 i32
-wayland_free(struct wayland_window* wayland);
+wayland_free(struct wayland_client* wayland);
 
 void
 wayland_set_pointer_sprite(struct wl_shm_pool* pool, u32 width, u32 height, i32 hot_spot_x, i32 hot_spot_y, struct wl_compositor* compositor, struct wl_pointer* pointer);

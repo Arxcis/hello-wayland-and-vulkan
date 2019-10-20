@@ -15,8 +15,8 @@ on_button(u32 button) {
 
 i32
 main() {
-	struct wayland_window* window = wayland_create();
-    if (! window) {
+	struct wayland_client* client = wayland_create();
+    if (! client) {
         return EXIT_FAILURE;
     }
 
@@ -25,13 +25,13 @@ main() {
         perror("Error opening surface image");
         return EXIT_FAILURE;
     }
-    struct wl_shm_pool* pool = wayland_create_memory_pool(image, window->shared_memory);
+    struct wl_shm_pool* pool = wayland_create_memory_pool(image, client->shared_memory);
     close(image);
     if (! pool) {
         return EXIT_FAILURE;
     }
 
-    struct wl_shell_surface* surface = wayland_create_surface(window->compositor, window->shell);
+    struct wl_shell_surface* surface = wayland_create_surface(client->compositor, client->shell);
     if (! surface) {
         return EXIT_FAILURE;
     }
@@ -43,14 +43,14 @@ main() {
 
     wayland_bind_buffer(buffer, surface);
 
-    i32 err = wayland_set_pointer_sprite(pool, 100, 59, 10, 35, window->compositor, window->pointer);
+    i32 err = wayland_set_pointer_sprite(pool, 100, 59, 10, 35, client->compositor, client->pointer);
     if (err) {
         return err;
     }
     wayland_set_pointer_callback(surface, on_button);
 
     while (! done) {
-        done = wayland_listen(window->display);
+        done = wayland_listen(client->display);
     }
 
     wayland_free_buffer(buffer);

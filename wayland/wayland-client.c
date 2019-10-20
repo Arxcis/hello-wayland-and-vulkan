@@ -1,4 +1,4 @@
-#include "./wayland-window.h"
+#include "./wayland-client.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,29 +16,29 @@ struct wayland_pointer_data {
 
 static const struct wl_pointer_listener pointer_listener;
 static const struct wl_registry_listener registry_listener;
-static struct wayland_window* window;
+static struct wayland_client* client;
 
-struct wayland_window*
+struct wayland_client*
 wayland_create() {
-    window = malloc(sizeof(struct wayland_window));
+    client = malloc(sizeof(struct wayland_client));
 
-    window->display = wl_display_connect(NULL);
-    if (window->display == NULL) {
-        perror("Failed to connect to display: window->display == NULL");
+    client->display = wl_display_connect(NULL);
+    if (client->display == NULL) {
+        perror("Failed to connect to display: client->display == NULL");
         return NULL;
     }
 
-    struct wl_registry* registry = wl_display_get_registry(window->display);
+    struct wl_registry* registry = wl_display_get_registry(client->display);
 
     wl_registry_add_listener(
         registry,
         &registry_listener,
         NULL
     );
-    wl_display_roundtrip(window->display);
+    wl_display_roundtrip(client->display);
     wl_registry_destroy(registry);
 
-    return window;
+    return client;
 }
 
 bool
@@ -51,20 +51,20 @@ wayland_listen(struct wl_display* display) {
 }
 
 i32
-wayland_free(struct wayland_window* window) {
+wayland_free(struct wayland_client* client) {
 
-    struct pointer_data* data = wl_pointer_get_user_data(window->pointer);
+    struct pointer_data* data = wl_pointer_get_user_data(client->pointer);
     wl_buffer_destroy(data->buffer);
     wl_surface_destroy(data->surface);
     free(data);
-    wl_pointer_set_user_data(window->pointer, NULL);
-    wl_pointer_destroy(window->pointer);
+    wl_pointer_set_user_data(client->pointer, NULL);
+    wl_pointer_destroy(client->pointer);
 
-    wl_seat_destroy(window->seat);
-    wl_shell_destroy(window->shell);
-    wl_shm_destroy(window->shared_memory);
-    wl_compositor_destroy(window->compositor);
-    wl_display_disconnect(window->display);
+    wl_seat_destroy(client->seat);
+    wl_shell_destroy(client->shell);
+    wl_shm_destroy(client->shared_memory);
+    wl_compositor_destroy(client->compositor);
+    wl_display_disconnect(client->display);
 
     return EXIT_SUCCESS;
 }
