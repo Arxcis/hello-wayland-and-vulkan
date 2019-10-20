@@ -1,7 +1,7 @@
 #ifndef _WAYLAND_H_
 #define _WAYLAND_H_
 
-#include "./wayland-display.h"
+#include "./wayland-window.h"
 
 #include "./wayland-memory-pool.h"
 

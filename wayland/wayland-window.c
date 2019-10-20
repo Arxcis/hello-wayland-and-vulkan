@@ -1,11 +1,18 @@
-#include "./wayland-display.h"
+#include "./wayland-window.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "./wayland-buffer.h"
-#include "./wayland-pointer-data.h"
+
+struct wayland_pointer_data {
+    struct wl_surface* surface;
+    struct wl_buffer* buffer;
+    i32 hot_spot_x;
+    i32 hot_spot_y;
+    struct wl_surface* target_surface;
+};  
 
 static const struct wl_pointer_listener pointer_listener;
 static const struct wl_registry_listener registry_listener;
@@ -44,20 +51,20 @@ wayland_listen(struct wl_display* display) {
 }
 
 i32 
-wayland_free(struct wayland* wayland) {
+wayland_free(struct wayland_window* window) {
 
-    struct pointer_data* data = wl_pointer_get_user_data(wayland->pointer);
+    struct pointer_data* data = wl_pointer_get_user_data(window->pointer);
     wl_buffer_destroy(data->buffer);
     wl_surface_destroy(data->surface);
     free(data);
-    wl_pointer_set_user_data(wayland->pointer, NULL);
-    wl_pointer_destroy(wayland->pointer);
+    wl_pointer_set_user_data(window->pointer, NULL);
+    wl_pointer_destroy(window->pointer);
 
-    wl_seat_destroy(wayland->seat);
-    wl_shell_destroy(wayland->shell);
-    wl_shm_destroy(wayland->shared_memory);
-    wl_compositor_destroy(wayland->compositor);
-    wl_display_disconnect(wayland->display);
+    wl_seat_destroy(window->seat);
+    wl_shell_destroy(window->shell);
+    wl_shm_destroy(window->shared_memory);
+    wl_compositor_destroy(window->compositor);
+    wl_display_disconnect(window->display);
 
     return EXIT_SUCCESS;
 }
