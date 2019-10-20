@@ -57,5 +57,7 @@ main() {
     wayland_free_surface(surface);
     wayland_free_memory_pool(pool);
 
-	return wayland_free(wayland);
+	wayland_free(wayland);
+
+    return EXIT_SUCCESS;
 }

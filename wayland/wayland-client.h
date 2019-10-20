@@ -25,7 +25,7 @@ wayland_create();
 bool
 wayland_listen(struct wl_display* display);
 
-i32
+void
 wayland_free(struct wayland_client* wayland);
 
 void

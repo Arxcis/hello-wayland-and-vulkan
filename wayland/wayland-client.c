@@ -50,7 +50,7 @@ wayland_listen(struct wl_display* display) {
     return false;
 }
 
-i32
+void
 wayland_free(struct wayland_client* client) {
 
     struct pointer_data* data = wl_pointer_get_user_data(client->pointer);
@@ -65,8 +65,6 @@ wayland_free(struct wayland_client* client) {
     wl_shm_destroy(client->shared_memory);
     wl_compositor_destroy(client->compositor);
     wl_display_disconnect(client->display);
-
-    return EXIT_SUCCESS;
 }
 
 void
