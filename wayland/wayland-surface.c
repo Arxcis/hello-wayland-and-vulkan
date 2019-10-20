@@ -9,10 +9,12 @@ wayland_create_surface(
 ) {
     struct wl_surface* surface = wl_compositor_create_surface(compositor);
     if (surface == NULL)
+        perror("Failed to create surface: surface == NULL");
         return NULL;
 
     struct wl_shell_surface* shell_surface = wl_shell_get_shell_surface(shell, surface);
     if (shell_surface == NULL) {
+        perror("Failed to create surface: shell_surface == NULL");
         wl_surface_destroy(surface);
         return NULL;
     }

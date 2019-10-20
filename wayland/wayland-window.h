@@ -1,5 +1,5 @@
-#ifndef _WAYLAND_DISPLAY_H_
-#define _WAYLAND_DISPLAY_H_
+#ifndef _WAYLAND_WINDOW_H_
+#define _WAYLAND_WINDOW_H_
 
 #include <wayland-client.h>
 #include "../types.h"

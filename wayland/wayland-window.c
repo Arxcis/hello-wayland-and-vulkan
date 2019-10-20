@@ -24,8 +24,8 @@ wayland_create() {
 
     window->display = wl_display_connect(NULL);
     if (window->display == NULL) {
-        perror("Error opening display");
-        exit(EXIT_FAILURE);
+        perror("Failed to connect to display: window->display == NULL");
+        return NULL;
     }
 
     struct wl_registry* registry = wl_display_get_registry(window->display);
@@ -44,7 +44,7 @@ wayland_create() {
 bool
 wayland_listen(struct wl_display* display) {
     if (wl_display_dispatch(display) < 0) {
-        perror("Main loop error");
+        perror("Main loop error: wl_display_dispatch(display) < 0");
         return true;
     }
     return false;
@@ -78,7 +78,7 @@ wayland_set_pointer_callback(
     wl_surface_set_user_data(surface, callback);
 }
 
-void
+i32
 wayland_set_pointer_sprite(
     struct wl_shm_pool* pool,
     u32 width,
@@ -89,31 +89,33 @@ wayland_set_pointer_sprite(
     struct wl_pointer* pointer
 ) {
     struct wayland_pointer_data* data = malloc(sizeof(struct wayland_pointer_data));
-    if (data == NULL)
-        goto error;
+    if (data == NULL) {
+        perror("Failed to set pointer sprite: data == NULL")
+        return EXIT_FAILURE;
+    }
 
     data->hot_spot_x = hot_spot_x;
     data->hot_spot_y = hot_spot_y;
-    data->surface = wl_compositor_create_surface(compositor);
 
-    if (data->surface == NULL)
-        goto cleanup_alloc;
+    data->surface = wl_compositor_create_surface(compositor);
+    if (data->surface == NULL) {
+        perror("Failed to set pointer sprite: data->surface == NULL")
+        free(data);
+        return EXIT_FAILURE;
+    }
 
     data->buffer = wayland_create_buffer(pool, width, height);
 
-    if (data->buffer == NULL)
-        goto cleanup_surface;
+    if (data->buffer == NULL) {
+        perror("Failed to set pointer sprite: data->buffer == NULL")
+        wl_surface_destroy(data->surface);
+        free(data);
+        return EXIT_FAILURE;
+    }
 
     wl_pointer_set_user_data(pointer, data);
 
-    return;
-
-cleanup_surface:
-    wl_surface_destroy(data->surface);
-cleanup_alloc:
-    free(data);
-error:
-    perror("Unable to allocate cursor");
+    return EXIT_SUCCESS;
 }
 
 static void

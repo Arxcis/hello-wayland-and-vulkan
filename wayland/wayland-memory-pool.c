@@ -9,15 +9,17 @@ struct wl_shm_pool*
 wayland_create_memory_pool(
 	i32 file,
     struct wl_shm* shm
-){
+) {
     struct stat stat;
 
     if (fstat(file, &stat) != 0) {
+        perror("Failed to create memory pool: fstat(file, &stat) != 0");
         return NULL;
     }
 
     struct wayland_pool_data* data = malloc(sizeof(struct wayland_pool_data));
     if (data == NULL) {
+        perror("Failed to create memory pool: malloc failed");
         return NULL;
     }
 
@@ -29,6 +31,7 @@ wayland_create_memory_pool(
         PROT_READ, MAP_SHARED, data->fd, 0);
 
     if (data->memory == MAP_FAILED) {
+        perror("Failed to create memory pool: data->memory == MAP_FAILED");
         free(data);
         return NULL;
     }
@@ -36,6 +39,7 @@ wayland_create_memory_pool(
     struct wl_shm_pool* pool = wl_shm_create_pool(shm, data->fd, data->capacity);
 
     if (pool == NULL) {
+        perror("Failed to create memory pool: pool == NULL");
         munmap(data->memory, data->capacity);
         free(data);
         return NULL;
