@@ -3,4 +3,4 @@ bin/*
 images.bin
 images/*
 !images/.gitkeep
-
+.DS_Store

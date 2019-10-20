@@ -1,5 +1,5 @@
-#include "../types.h"
 #include "./wayland-buffer.h"
+
 #include "./wayland-pool-data.h"
 
 struct wl_buffer*

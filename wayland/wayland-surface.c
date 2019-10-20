@@ -1,8 +1,5 @@
 #include "./wayland-surface.h"
 
-#include <wayland-client.h>
-#include "../types.h"
-
 static const struct wl_shell_surface_listener shell_surface_listener;
 
 struct wl_shell_surface* 

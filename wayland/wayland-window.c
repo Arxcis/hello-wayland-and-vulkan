@@ -1,41 +1,42 @@
-#include "./wayland.h"
-#include "./wayland-pointer.h"
-#include "../types.h"
+#include "./wayland-display.h"
+
 #include <stdlib.h>
-#include <wayland-client.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "./wayland-buffer.h"
+#include "./wayland-pointer-data.h"
+
 static const struct wl_pointer_listener pointer_listener;
 static const struct wl_registry_listener registry_listener;
-static struct wayland* wayland;
+static struct wayland_window* window;
 
-struct wayland* 
+struct wayland_window* 
 wayland_create() {
-    wayland = malloc(sizeof(struct wayland));
+    window = malloc(sizeof(struct wayland_window));
 
-    wayland->display = wl_display_connect(NULL);
-    if (wayland->display == NULL) {
+    window->display = wl_display_connect(NULL);
+    if (window->display == NULL) {
         perror("Error opening display");
         exit(EXIT_FAILURE);
     }
 
-    struct wl_registry* registry = wl_display_get_registry(wayland->display);
+    struct wl_registry* registry = wl_display_get_registry(window->display);
 
     wl_registry_add_listener(
         registry, 
         &registry_listener,
         NULL
     );
-    wl_display_roundtrip(wayland->display);
+    wl_display_roundtrip(window->display);
     wl_registry_destroy(registry);
 
-    return wayland;
+    return window;
 }
 
 bool
 wayland_listen(struct wl_display* display) {
-    if (wl_display_dispatch(wayland->display) < 0) {
+    if (wl_display_dispatch(display) < 0) {
         perror("Main loop error");
         return true;
     }
@@ -61,6 +62,52 @@ wayland_free(struct wayland* wayland) {
     return EXIT_SUCCESS;
 }
 
+void 
+wayland_set_pointer_callback(
+    struct wl_shell_surface* shell_surface,
+    void (*callback)(u32)
+) {
+    struct wl_surface* surface = wl_shell_surface_get_user_data(shell_surface);
+    wl_surface_set_user_data(surface, callback);
+}
+
+void 
+wayland_set_pointer_sprite(
+    struct wl_shm_pool* pool,
+    u32 width, 
+    u32 height,
+    i32 hot_spot_x, 
+    i32 hot_spot_y,
+    struct wl_compositor* compositor,
+    struct wl_pointer* pointer
+) {
+    struct wayland_pointer_data* data = malloc(sizeof(struct wayland_pointer_data));
+    if (data == NULL)
+        goto error;
+
+    data->hot_spot_x = hot_spot_x;
+    data->hot_spot_y = hot_spot_y;
+    data->surface = wl_compositor_create_surface(compositor);
+
+    if (data->surface == NULL)
+        goto cleanup_alloc;
+
+    data->buffer = wayland_create_buffer(pool, width, height);
+
+    if (data->buffer == NULL)
+        goto cleanup_surface;
+
+    wl_pointer_set_user_data(pointer, data);
+
+    return;
+
+cleanup_surface:
+    wl_surface_destroy(data->surface);
+cleanup_alloc:
+    free(data);
+error:
+    perror("Unable to allocate cursor");
+}
 
 static void 
 registry_global(

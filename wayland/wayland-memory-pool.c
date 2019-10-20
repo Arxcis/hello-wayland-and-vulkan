@@ -1,10 +1,8 @@
+#include "./wayland-memory-pool.h"
+
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <sys/mman.h>
-#include <wayland-client.h>
-
-#include "../types.h"
-#include "./wayland-memory-pool.h"
 #include "./wayland-pool-data.h"
 
 struct wl_shm_pool* 
