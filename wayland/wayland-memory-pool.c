@@ -5,7 +5,7 @@
 #include <sys/mman.h>
 #include "./wayland-pool-data.h"
 
-struct wl_shm_pool* 
+struct wl_shm_pool*
 wayland_create_memory_pool(
 	i32 file,
     struct wl_shm* shm
@@ -15,7 +15,7 @@ wayland_create_memory_pool(
     if (fstat(file, &stat) != 0) {
         return NULL;
     }
-    
+
     struct wayland_pool_data* data = malloc(sizeof(struct wayland_pool_data));
     if (data == NULL) {
         return NULL;
@@ -46,7 +46,7 @@ wayland_create_memory_pool(
     return pool;
 }
 
-void 
+void
 wayland_free_memory_pool(
 	struct wl_shm_pool* pool
 ) {

@@ -12,13 +12,13 @@ struct wayland_pointer_data {
     i32 hot_spot_x;
     i32 hot_spot_y;
     struct wl_surface* target_surface;
-};  
+};
 
 static const struct wl_pointer_listener pointer_listener;
 static const struct wl_registry_listener registry_listener;
 static struct wayland_window* window;
 
-struct wayland_window* 
+struct wayland_window*
 wayland_create() {
     window = malloc(sizeof(struct wayland_window));
 
@@ -31,7 +31,7 @@ wayland_create() {
     struct wl_registry* registry = wl_display_get_registry(window->display);
 
     wl_registry_add_listener(
-        registry, 
+        registry,
         &registry_listener,
         NULL
     );
@@ -50,7 +50,7 @@ wayland_listen(struct wl_display* display) {
     return false;
 }
 
-i32 
+i32
 wayland_free(struct wayland_window* window) {
 
     struct pointer_data* data = wl_pointer_get_user_data(window->pointer);
@@ -69,7 +69,7 @@ wayland_free(struct wayland_window* window) {
     return EXIT_SUCCESS;
 }
 
-void 
+void
 wayland_set_pointer_callback(
     struct wl_shell_surface* shell_surface,
     void (*callback)(u32)
@@ -78,12 +78,12 @@ wayland_set_pointer_callback(
     wl_surface_set_user_data(surface, callback);
 }
 
-void 
+void
 wayland_set_pointer_sprite(
     struct wl_shm_pool* pool,
-    u32 width, 
+    u32 width,
     u32 height,
-    i32 hot_spot_x, 
+    i32 hot_spot_x,
     i32 hot_spot_y,
     struct wl_compositor* compositor,
     struct wl_pointer* pointer
@@ -116,142 +116,142 @@ error:
     perror("Unable to allocate cursor");
 }
 
-static void 
+static void
 registry_global(
 	void* data,
-    struct wl_registry* registry, 
+    struct wl_registry* registry,
     u32 name,
-    const char* interface, 
+    const char* interface,
 	u32 version
 ) {
     if (strcmp(interface, wl_compositor_interface.name) == 0)
         wayland->compositor = wl_registry_bind(
-        	registry, 
+        	registry,
         	name,
-            &wl_compositor_interface, 
+            &wl_compositor_interface,
             min(version, 4)
         );
     else if (strcmp(interface, wl_shm_interface.name) == 0)
         wayland->shared_memory = wl_registry_bind(
-        	registry, 
+        	registry,
         	name,
-            &wl_shm_interface, 
+            &wl_shm_interface,
             min(version, 1)
         );
     else if (strcmp(interface, wl_shell_interface.name) == 0)
         wayland->shell = wl_registry_bind(
-        	registry, 
+        	registry,
         	name,
-            &wl_shell_interface, 
+            &wl_shell_interface,
             min(version, 1)
         );
     else if (strcmp(interface, wl_seat_interface.name) == 0) {
         wayland->seat = wl_registry_bind(
-        	registry, 
+        	registry,
         	name,
-            &wl_seat_interface, 
+            &wl_seat_interface,
             min(version, 2)
         );
         wayland->pointer = wl_seat_get_pointer(wayland->seat);
         wl_pointer_add_listener(
-        	wayland->pointer, 
+        	wayland->pointer,
         	&pointer_listener,
             NULL
         );
     }
 }
 
-static void 
+static void
 registry_global_remove(
 	void* a,
-    struct wl_registry* b, 
+    struct wl_registry* b,
     u32 c
 ) { }
 
 
-static const struct wl_registry_listener 
+static const struct wl_registry_listener
 registry_listener = {
     .global = registry_global,
     .global_remove = registry_global_remove
 };
 
 
-static void 
+static void
 pointer_enter(
     void* data,
     struct wl_pointer* pointer,
-    u32 serial, 
+    u32 serial,
     struct wl_surface* surface,
-    wl_fixed_t surface_x, 
+    wl_fixed_t surface_x,
     wl_fixed_t surface_y
 ) {
     struct pointer_data* pointer_data = wl_pointer_get_user_data(pointer);
 
     pointer_data->target_surface = surface;
-    
+
     wl_surface_attach(
         pointer_data->surface,
-        pointer_data->buffer, 
-        0, 
+        pointer_data->buffer,
+        0,
         0
     );
     wl_surface_commit(pointer_data->surface);
     wl_pointer_set_cursor(
-        pointer, 
+        pointer,
         serial,
-        pointer_data->surface, 
+        pointer_data->surface,
         pointer_data->hot_spot_x,
         pointer_data->hot_spot_y
     );
 }
 
-static void 
+static void
 pointer_leave(
     void* data,
-    struct wl_pointer* pointer, 
+    struct wl_pointer* pointer,
     u32 serial,
     struct wl_surface* wl_surface
 ) { }
 
-static void 
+static void
 pointer_motion(
     void* data,
-    struct wl_pointer* pointer, 
+    struct wl_pointer* pointer,
     u32 time,
-    wl_fixed_t surface_x, 
+    wl_fixed_t surface_x,
     wl_fixed_t surface_y
 ) { }
 
-static void 
+static void
 pointer_button(
     void* data,
-    struct wl_pointer* pointer, 
+    struct wl_pointer* pointer,
     u32 serial,
-    u32 time, 
-    u32 button, 
+    u32 time,
+    u32 button,
     u32 state
 ) {
     struct pointer_data* pointer_data = wl_pointer_get_user_data(pointer);
-    
-    void (*callback)(u32) = wl_surface_get_user_data(pointer_data->target_surface);    
+
+    void (*callback)(u32) = wl_surface_get_user_data(pointer_data->target_surface);
     if (callback == NULL) {
         return;
     }
-    
+
     callback(button);
 }
 
-static void 
+static void
 pointer_axis(
     void* data,
-    struct wl_pointer* wl_pointer, 
+    struct wl_pointer* wl_pointer,
     u32 time,
-    u32 axis, 
+    u32 axis,
     wl_fixed_t value
 ) { }
 
 
-static const struct wl_pointer_listener 
+static const struct wl_pointer_listener
 pointer_listener = {
     .enter = pointer_enter,
     .leave = pointer_leave,

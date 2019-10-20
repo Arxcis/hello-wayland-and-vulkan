@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h> 
+#include <fcntl.h>
 #include <unistd.h>
 
 #include "./types.h"
@@ -8,12 +8,12 @@
 
 static bool done = false;
 
-void 
+void
 on_button(u32 button) {
 	done = true;
 }
 
-i32 
+i32
 main() {
 	struct wayland* wayland = wayland_create();
 
@@ -33,10 +33,10 @@ main() {
     wayland_bind_buffer(buffer, surface);
 
     wayland_set_pointer_sprite(
-    	pool, 
+    	pool,
     	100,
-        59, 
-        10, 
+        59,
+        10,
         35,
         wayland->compositor,
         wayland->pointer

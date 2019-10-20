@@ -7,7 +7,7 @@
 struct wl_shm_pool*
 wayland_create_memory_pool(i32 file, struct wl_shm* shm);
 
-void 
+void
 wayland_free_memory_pool(struct wl_shm_pool* pool);
 
 #endif

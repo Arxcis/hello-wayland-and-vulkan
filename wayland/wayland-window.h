@@ -28,10 +28,10 @@ wayland_listen(struct wl_display* display);
 i32
 wayland_free(struct wayland_window* wayland);
 
-void 
+void
 wayland_set_pointer_sprite(struct wl_shm_pool* pool, u32 width, u32 height, i32 hot_spot_x, i32 hot_spot_y, struct wl_compositor* compositor, struct wl_pointer* pointer);
 
-void 
+void
 wayland_set_pointer_callback(struct wl_shell_surface* surface, void (*callback)(u32));
 
 #endif

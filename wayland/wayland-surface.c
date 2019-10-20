@@ -2,7 +2,7 @@
 
 static const struct wl_shell_surface_listener shell_surface_listener;
 
-struct wl_shell_surface* 
+struct wl_shell_surface*
 wayland_create_surface(
 	struct wl_compositor* compositor,
 	struct wl_shell* shell
@@ -19,7 +19,7 @@ wayland_create_surface(
 
     wl_shell_surface_add_listener(
         shell_surface,
-        &shell_surface_listener, 
+        &shell_surface_listener,
         0
     );
     wl_shell_surface_set_toplevel(shell_surface);
@@ -29,7 +29,7 @@ wayland_create_surface(
     return shell_surface;
 }
 
-void 
+void
 wayland_free_surface(
 	struct wl_shell_surface* shell_surface
 ) {
@@ -40,21 +40,21 @@ wayland_free_surface(
 }
 
 
-static void 
+static void
 shell_surface_ping(
 	void* data,
-    struct wl_shell_surface* shell_surface, 
+    struct wl_shell_surface* shell_surface,
     u32 serial
 ) {
     wl_shell_surface_pong(shell_surface, serial);
 }
 
-static void 
+static void
 shell_surface_configure(
 	void* data,
     struct wl_shell_surface* shell_surface,
-    u32 edges, 
-    i32 width, 
+    u32 edges,
+    i32 width,
     i32 height
 ) { }
 

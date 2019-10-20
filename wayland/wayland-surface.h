@@ -6,7 +6,7 @@
 struct wl_shell_surface*
 wayland_create_surface(struct wl_compositor* compositor, struct wl_shell* shell);
 
-void 
+void
 wayland_free_surface(struct wl_shell_surface* shell_surface);
 
 #endif
