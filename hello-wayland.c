@@ -25,6 +25,7 @@ main() {
         perror("Error opening surface image");
         return EXIT_FAILURE;
     }
+
     struct wl_shm_pool* pool = wayland_create_memory_pool(image, client->shared_memory);
     close(image);
     if (! pool) {
@@ -47,6 +48,7 @@ main() {
     if (err) {
         return err;
     }
+
     wayland_set_pointer_callback(surface, on_button);
 
     while (! done) {
@@ -56,7 +58,6 @@ main() {
     wayland_free_buffer(buffer);
     wayland_free_surface(surface);
     wayland_free_memory_pool(pool);
-
 	wayland_free(wayland);
 
     return EXIT_SUCCESS;
