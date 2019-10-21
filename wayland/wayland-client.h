@@ -3,6 +3,7 @@
 
 #include <wayland-client.h>
 #include "../types.h"
+#include "./wayland-pointer.h"
 
 struct wayland_client {
   /**
@@ -13,13 +14,14 @@ struct wayland_client {
    */
     struct wl_display* display;
     struct wl_compositor* compositor;
-    struct wl_pointer* pointer;
     struct wl_seat* seat;
     struct wl_shell* shell;
     struct wl_shm* shared_memory;
+
+    struct wayland_pointer pointer;
 };
 
-struct wayland_client*
+struct wayland_client
 wayland_create();
 
 bool
@@ -29,7 +31,7 @@ void
 wayland_free(struct wayland_client* wayland);
 
 void
-wayland_set_pointer_sprite(struct wl_shm_pool* pool, u32 width, u32 height, i32 hot_spot_x, i32 hot_spot_y, struct wl_compositor* compositor, struct wl_pointer* pointer);
+wayland_set_pointer_sprite(struct wl_shm_pool* pool, u32 width, u32 height, i32 hot_spot_x, i32 hot_spot_y, struct wl_compositor* compositor, struct wayland_pointer pointer);
 
 void
 wayland_set_pointer_callback(struct wl_shell_surface* surface, void (*callback)(u32));

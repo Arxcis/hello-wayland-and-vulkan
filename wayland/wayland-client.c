@@ -6,36 +6,27 @@
 
 #include "./wayland-buffer.h"
 
-struct wayland_pointer_data {
-    struct wl_surface* surface;
-    struct wl_buffer* buffer;
-    i32 hot_spot_x;
-    i32 hot_spot_y;
-    struct wl_surface* target_surface;
-};
-
 static const struct wl_pointer_listener pointer_listener;
 static const struct wl_registry_listener registry_listener;
-static struct wayland_client* client;
 
-struct wayland_client*
+struct wayland_client
 wayland_create() {
-    client = malloc(sizeof(struct wayland_client));
+    struct wayland_client client;
 
-    client->display = wl_display_connect(NULL);
-    if (client->display == NULL) {
-        perror("Failed to connect to display: client->display == NULL");
+    client.display = wl_display_connect(NULL);
+    if (client.display == NULL) {
+        perror("Failed to connect to display: client.display == NULL");
         return NULL;
     }
 
-    struct wl_registry* registry = wl_display_get_registry(client->display);
+    struct wl_registry* registry = wl_display_get_registry(client.display);
 
     wl_registry_add_listener(
         registry,
         &registry_listener,
         NULL
     );
-    wl_display_roundtrip(client->display);
+    wl_display_roundtrip(client.display);
     wl_registry_destroy(registry);
 
     return client;
@@ -51,20 +42,17 @@ wayland_listen(struct wl_display* display) {
 }
 
 void
-wayland_free(struct wayland_client* client) {
+wayland_free(const struct wayland_client client) {
 
-    struct pointer_data* data = wl_pointer_get_user_data(client->pointer);
-    wl_buffer_destroy(data->buffer);
-    wl_surface_destroy(data->surface);
-    free(data);
-    wl_pointer_set_user_data(client->pointer, NULL);
-    wl_pointer_destroy(client->pointer);
+    wl_buffer_destroy(client.pointer.buffer);
+    wl_surface_destroy(client.pointer.surface);
+    wl_pointer_destroy(client.pointer.pointer);
 
-    wl_seat_destroy(client->seat);
-    wl_shell_destroy(client->shell);
-    wl_shm_destroy(client->shared_memory);
-    wl_compositor_destroy(client->compositor);
-    wl_display_disconnect(client->display);
+    wl_seat_destroy(client.seat);
+    wl_shell_destroy(client.shell);
+    wl_shm_destroy(client.shared_memory);
+    wl_compositor_destroy(client.compositor);
+    wl_display_disconnect(client.display);
 }
 
 void
@@ -79,39 +67,28 @@ wayland_set_pointer_callback(
 i32
 wayland_set_pointer_sprite(
     struct wl_shm_pool* pool,
-    u32 width,
-    u32 height,
-    i32 hot_spot_x,
-    i32 hot_spot_y,
-    struct wl_compositor* compositor,
-    struct wl_pointer* pointer
+    const u32 width,
+    const u32 height,
+    const i32 hot_spot_x,
+    const i32 hot_spot_y,
+    const struct wl_compositor* compositor,
+    struct wayland_pointer* pointer
 ) {
-    struct wayland_pointer_data* data = malloc(sizeof(struct wayland_pointer_data));
-    if (data == NULL) {
-        perror("Failed to set pointer sprite: data == NULL")
-        return EXIT_FAILURE;
-    }
+    pointer->hot_spot_x = hot_spot_x;
+    pointer->hot_spot_y = hot_spot_y;
+    pointer->surface = wl_compositor_create_surface(compositor);
 
-    data->hot_spot_x = hot_spot_x;
-    data->hot_spot_y = hot_spot_y;
-
-    data->surface = wl_compositor_create_surface(compositor);
-    if (data->surface == NULL) {
+    if (pointer->surface == NULL) {
         perror("Failed to set pointer sprite: data->surface == NULL")
-        free(data);
         return EXIT_FAILURE;
     }
 
-    data->buffer = wayland_create_buffer(pool, width, height);
-
-    if (data->buffer == NULL) {
+    pointer->buffer = wayland_create_buffer(pool, width, height);
+    if (pointer->buffer == NULL) {
         perror("Failed to set pointer sprite: data->buffer == NULL")
-        wl_surface_destroy(data->surface);
-        free(data);
+        wl_surface_destroy(pointer->surface);
         return EXIT_FAILURE;
     }
-
-    wl_pointer_set_user_data(pointer, data);
 
     return EXIT_SUCCESS;
 }
