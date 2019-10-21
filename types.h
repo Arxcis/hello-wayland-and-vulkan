@@ -10,9 +10,8 @@
 #define false 0
 #define true 1
 
-typedef uint8_t bool;
-typedef uint32_t u32;
-typedef int32_t i32;
-typedef uint32_t pixel;
+#define bool  uint8_t;
+#define u32   uint32_t;
+#define i32   int32_t;
 
 #endif

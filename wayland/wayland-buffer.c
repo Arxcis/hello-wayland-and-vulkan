@@ -8,26 +8,7 @@ wayland_create_buffer(
     u32 width,
     u32 height
 ) {
-	static const u32 PIXEL_FORMAT_ID = WL_SHM_FORMAT_ARGB8888;
 
-    struct wayland_pool_data* pool_data = wl_shm_pool_get_user_data(pool);
-
-    struct wl_buffer* buffer = wl_shm_pool_create_buffer(
-    	pool,
-        pool_data->size,
-        width,
-        height,
-        width*sizeof(pixel),
-        PIXEL_FORMAT_ID
-    );
-    if (buffer == NULL) {
-        perror("Failed to create buffer: buffer == NULL");
-        return NULL;
-    }
-
-    pool_data->size += width*height*sizeof(pixel);
-
-    return buffer;
 }
 
 

@@ -8,14 +8,14 @@
 
 static const struct wl_pointer_listener pointer_listener;
 static const struct wl_registry_listener registry_listener;
+static const struct wayland* client;
 
-struct wayland_client
+struct wayland*
 wayland_create() {
-    struct wayland_client client;
+    client = malloc(sizeof(struct wayland));
 
     client.display = wl_display_connect(NULL);
     if (client.display == NULL) {
-        perror("Failed to connect to display: client.display == NULL");
         return NULL;
     }
 
@@ -32,66 +32,20 @@ wayland_create() {
     return client;
 }
 
-bool
-wayland_listen(struct wl_display* display) {
-    if (wl_display_dispatch(display) < 0) {
-        perror("Main loop error: wl_display_dispatch(display) < 0");
-        return true;
-    }
-    return false;
-}
-
 void
-wayland_free(const struct wayland_client client) {
+wayland_destroy(const struct wayland* client) {
 
-    wl_buffer_destroy(client.pointer.buffer);
-    wl_surface_destroy(client.pointer.surface);
-    wl_pointer_destroy(client.pointer.pointer);
-
+    wl_pointer_destroy(client->pointer);
     wl_seat_destroy(client.seat);
     wl_shell_destroy(client.shell);
     wl_shm_destroy(client.shared_memory);
     wl_compositor_destroy(client.compositor);
     wl_display_disconnect(client.display);
+
+    free(client->pointer);
+    free(client);
 }
 
-void
-wayland_set_pointer_callback(
-    struct wl_shell_surface* shell_surface,
-    void (*callback)(u32)
-) {
-    struct wl_surface* surface = wl_shell_surface_get_user_data(shell_surface);
-    wl_surface_set_user_data(surface, callback);
-}
-
-i32
-wayland_set_pointer_sprite(
-    struct wl_shm_pool* pool,
-    const u32 width,
-    const u32 height,
-    const i32 hot_spot_x,
-    const i32 hot_spot_y,
-    const struct wl_compositor* compositor,
-    struct wayland_pointer* pointer
-) {
-    pointer->hot_spot_x = hot_spot_x;
-    pointer->hot_spot_y = hot_spot_y;
-    pointer->surface = wl_compositor_create_surface(compositor);
-
-    if (pointer->surface == NULL) {
-        perror("Failed to set pointer sprite: data->surface == NULL")
-        return EXIT_FAILURE;
-    }
-
-    pointer->buffer = wayland_create_buffer(pool, width, height);
-    if (pointer->buffer == NULL) {
-        perror("Failed to set pointer sprite: data->buffer == NULL")
-        wl_surface_destroy(pointer->surface);
-        return EXIT_FAILURE;
-    }
-
-    return EXIT_SUCCESS;
-}
 
 static void
 registry_global(
