@@ -1,8 +1,9 @@
-#include "./wayland-pointer.h"
+#include "./playland-cursor.h"
+#include <stdlib.h>
 
-i32
+int
 playland_cursor_set_sprite(
-    const struct playland_cursor* mouse,
+    const struct playland_cursor* cursor,
     const struct wl_buffer* sprite
 ) {
     // pointer->hot_spot_x = hot_spot_x;

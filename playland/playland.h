@@ -2,9 +2,10 @@
 #define PLAYLAND
 
 #include <wayland-client.h>
-#include <playland/playland-file.h>
-#include <playland/playland-window.h>
-#include <playland/playland-cursor.h>
+#include <stdbool.h>
+#include "./playland-file.h"
+#include "./playland-window.h"
+#include "./playland-cursor.h"
 
 struct playland {
    /**
@@ -17,7 +18,7 @@ struct playland {
     struct wl_compositor* compositor;
     struct wl_seat* seat;
     struct wl_shell* shell;
-    struct wl_shm* shared_memory;
+    struct wl_shm* shm;
     struct wl_pointer* pointer;
 };
 
@@ -25,27 +26,27 @@ struct playland*
 playland_create();
 
 struct playland_file*
-playland_create_file(const struct playland*, const char* filepath);
+playland_create_file(const struct playland* playland, const char* filepath);
 
 struct playland_window*
-playland_create_window(const struct playland*);
+playland_create_window(const struct playland* playland);
 
 struct playland_cursor*
-playland_create_cursor(const struct playland*);
-
-void
-playland_destroy(const struct playland*);
-
-void
-playland_destroy_file(const struct playland_file*);
-
-void
-playland_destroy_window(const struct playland_window*);
-
-void
-playland_destroy_cursor(const struct playland_cursor*);
+playland_create_cursor(const struct playland* playland);
 
 bool
-playland_display_listen(const struct playland* playland);
+playland_listen(const struct playland* playland);
+
+void
+playland_destroy(struct playland* playland);
+
+void
+playland_destroy_file(struct playland_file* file);
+
+void
+playland_destroy_window(struct playland_window* window);
+
+void
+playland_destroy_cursor(struct playland_cursor* cursor);
 
 #endif

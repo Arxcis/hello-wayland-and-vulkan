@@ -2,16 +2,21 @@
 #define PLAYLAND_FILE
 
 #include <wayland-client.h>
+#define pixel_t uint32_t
 
 struct playland_file {
-    i32          fd;
-    u32          capacity;
-    u32          size;
-    pixel*       memory;
-    wl_shm_pool* pool;
+    int      fd;
+    unsigned capacity;
+    unsigned size;
+    pixel_t* memory;
+    struct wl_shm_pool* pool;
 };
 
 struct wl_buffer*
-wayland_file_create_buffer(const struct playland_file*);
+playland_file_create_buffer(
+    struct playland_file* file,
+    const int width,
+    const int height
+);
 
 #endif

@@ -1,4 +1,4 @@
-#include <playland/playland.h>
+#include "playland.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,7 +9,9 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-static const struct playland* playland = NULL;
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
+static struct playland* playland = NULL;
 static const struct wl_pointer_listener pointer_listener;
 static const struct wl_registry_listener registry_listener;
 static const struct wl_shell_surface_listener shell_surface_listener;
@@ -45,12 +47,12 @@ playland_listen(const struct playland* playland) {
 }
 
 void
-playland_destroy(const struct playland* playland) {
+playland_destroy(struct playland* playland) {
 
     wl_pointer_destroy(playland->pointer);
     wl_seat_destroy(playland->seat);
     wl_shell_destroy(playland->shell);
-    wl_shm_destroy(playland->shared_memory);
+    wl_shm_destroy(playland->shm);
     wl_compositor_destroy(playland->compositor);
     wl_display_disconnect(playland->display);
 
@@ -62,7 +64,7 @@ struct playland_file*
 playland_create_file(const struct playland* playland, const char* filepath) {
     struct stat stat;
 
-    i32 fd = open(filepath, O_RDWR);
+    int fd = open(filepath, O_RDWR);
     if (fd < 0) {
         return NULL;
     }
@@ -71,7 +73,7 @@ playland_create_file(const struct playland* playland, const char* filepath) {
         return NULL;
     }
 
-    const struct playland_file* file = malloc(sizeof(struct playland_file));
+    struct playland_file* file = malloc(sizeof(struct playland_file));
     if (file == NULL) {
         return NULL;
     }
@@ -86,21 +88,19 @@ playland_create_file(const struct playland* playland, const char* filepath) {
         return NULL;
     }
 
-    struct wl_shm_pool* pool = wl_shm_create_pool(playland->shm, file->fd, file->capacity);
-    if (pool == NULL) {
+    file->pool = wl_shm_create_pool(playland->shm, file->fd, file->capacity);
+    if (file->pool == NULL) {
         munmap(file->memory, file->capacity);
         free(file);
         return NULL;
     }
-
-    file->pool = pool;
     close(fd);
 
-    return pool;
+    return file;
 }
 
 void
-playland_destroy_file(const struct playland_file* file) {
+playland_destroy_file(struct playland_file* file) {
     wl_shm_pool_destroy(file->pool);
     munmap(file->memory, file->capacity);
     free(file);
@@ -110,12 +110,12 @@ playland_destroy_file(const struct playland_file* file) {
 struct playland_window*
 playland_create_window(const struct playland* playland) {
 
-    const struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
-    if (! window_surface) {
+    struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
+    if (! surface) {
         return NULL;
     }
 
-    const struct wl_shell_surface* shell_surface = wl_shell_get_shell_surface(playland->shell, surface);
+    struct wl_shell_surface* shell_surface = wl_shell_get_shell_surface(playland->shell, surface);
     if (! shell_surface) {
         return NULL;
     }
@@ -138,7 +138,7 @@ playland_create_window(const struct playland* playland) {
 }
 
 void
-playland_destroy_window(const struct playland_window* window) {
+playland_destroy_window(struct playland_window* window) {
     // shell surface must be destroyed before the surface
     wl_shell_surface_destroy(window->shell_surface);
     wl_surface_destroy(window->surface);
@@ -147,19 +147,19 @@ playland_destroy_window(const struct playland_window* window) {
 
 
 struct playland_cursor*
-playland_create_cusor(const struct playland* playland) {
-    const struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
-    if (! sprite_surface) {
-        return EXIT_FAILURE;
+playland_create_cursor(const struct playland* playland) {
+    struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
+    if (! surface) {
+        return NULL;
     }
 
-    const struct playland_cursor* cursor = malloc(sizeof(playland_cursor));
+    struct playland_cursor* cursor = malloc(sizeof(struct playland_cursor));
 
     return cursor;
 }
 
 void
-playland_destroy_cusor(const struct playland_create_cusor* cursor) {
+playland_destroy_cursor(struct playland_cursor* cursor) {
     wl_surface_destroy(cursor->surface);
     free(cursor);
 }
@@ -172,7 +172,7 @@ static void
 shell_surface_ping(
     void* data,
     struct wl_shell_surface* shell_surface,
-    u32 serial
+    unsigned serial
 ) {
     wl_shell_surface_pong(shell_surface, serial);
 }
@@ -181,9 +181,9 @@ static void
 shell_surface_configure(
     void* data,
     struct wl_shell_surface* shell_surface,
-    u32 edges,
-    i32 width,
-    i32 height
+    unsigned edges,
+    int width,
+    int height
 ) { }
 
 static const struct wl_shell_surface_listener
@@ -211,7 +211,7 @@ registry_global(
             min(version, 4)
         );
     else if (strcmp(interface, wl_shm_interface.name) == 0)
-        playland->shared_memory = wl_registry_bind(
+        playland->shm = wl_registry_bind(
         	registry,
         	name,
             &wl_shm_interface,
@@ -244,7 +244,7 @@ static void
 registry_global_remove(
 	void* a,
     struct wl_registry* b,
-    u32 c
+    unsigned c
 ) { }
 
 
@@ -261,28 +261,28 @@ static void
 pointer_enter(
     void* data,
     struct wl_pointer* pointer,
-    u32 serial,
+    unsigned serial,
     struct wl_surface* surface,
     wl_fixed_t surface_x,
     wl_fixed_t surface_y
 ) {
-    struct pointer_data* pointer_data = wl_pointer_get_user_data(pointer);
+    struct playland_cursor* cursor = wl_pointer_get_user_data(pointer);
 
-    pointer_data->target_surface = surface;
+    cursor->target_surface = surface;
 
     wl_surface_attach(
-        pointer_data->surface,
-        pointer_data->buffer,
+        cursor->surface,
+        cursor->buffer,
         0,
         0
     );
-    wl_surface_commit(pointer_data->surface);
+    wl_surface_commit(cursor->surface);
     wl_pointer_set_cursor(
         pointer,
         serial,
-        pointer_data->surface,
-        pointer_data->hot_spot_x,
-        pointer_data->hot_spot_y
+        cursor->surface,
+        cursor->hot_spot_x,
+        cursor->hot_spot_y
     );
 }
 
@@ -290,7 +290,7 @@ static void
 pointer_leave(
     void* data,
     struct wl_pointer* pointer,
-    u32 serial,
+    unsigned serial,
     struct wl_surface* wl_surface
 ) { }
 
@@ -298,7 +298,7 @@ static void
 pointer_motion(
     void* data,
     struct wl_pointer* pointer,
-    u32 time,
+    unsigned time,
     wl_fixed_t surface_x,
     wl_fixed_t surface_y
 ) { }
@@ -307,27 +307,26 @@ static void
 pointer_button(
     void* data,
     struct wl_pointer* pointer,
-    u32 serial,
-    u32 time,
-    u32 button,
-    u32 state
+    unsigned serial,
+    unsigned time,
+    unsigned button,
+    unsigned state
 ) {
-    struct pointer_data* pointer_data = wl_pointer_get_user_data(pointer);
+    struct playland_cursor* cursor = wl_pointer_get_user_data(pointer);
 
-    void (*callback)(u32) = wl_surface_get_user_data(pointer_data->target_surface);
-    if (callback == NULL) {
+    if (cursor->on_button == NULL) {
         return;
     }
 
-    callback(button);
+    cursor->on_button(button);
 }
 
 static void
 pointer_axis(
     void* data,
     struct wl_pointer* wl_pointer,
-    u32 time,
-    u32 axis,
+    unsigned time,
+    unsigned axis,
     wl_fixed_t value
 ) { }
 

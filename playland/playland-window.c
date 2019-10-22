@@ -1,9 +1,9 @@
-#include <playland/playland-window.h>
+#include "./playland-window.h"
 
 void
 playland_window_set_background(
     const struct playland_window* window,
-    const struct wl_buffer* buffer,
+    struct wl_buffer* buffer
 ) {
     wl_surface_attach(window->surface, buffer, 0, 0);
     wl_surface_commit(window->surface);
