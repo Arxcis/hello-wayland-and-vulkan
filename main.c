@@ -57,7 +57,9 @@ main() {
         GOTO(panic_window);
     }
     cursor->on_button = on_button;
-    playland_cursor_set_sprite(cursor, cursor_sprite);
+    cursor->sprite = cursor_sprite;
+    cursor->hotspot_x = 35;
+    cursor->hotspot_y = 10;
     //
     // 3. Listen for events
     //

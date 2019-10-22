@@ -154,6 +154,7 @@ playland_create_cursor(const struct playland* playland) {
     }
 
     struct playland_cursor* cursor = malloc(sizeof(struct playland_cursor));
+    wl_pointer_set_user_data(playland->pointer, cursor);
 
     return cursor;
 }
@@ -270,13 +271,9 @@ pointer_enter(
 
     cursor->target_surface = surface;
 
-    wl_surface_attach(
-        cursor->surface,
-        cursor->buffer,
-        0,
-        0
-    );
+    wl_surface_attach(cursor->surface, cursor->sprite, 0, 0);
     wl_surface_commit(cursor->surface);
+
     wl_pointer_set_cursor(
         pointer,
         serial,
@@ -313,7 +310,6 @@ pointer_button(
     unsigned state
 ) {
     struct playland_cursor* cursor = wl_pointer_get_user_data(pointer);
-
     if (cursor->on_button == NULL) {
         return;
     }
