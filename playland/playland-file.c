@@ -1,10 +1,10 @@
-#include "./wayland-file.h"
+#include <playland/playland-file.h>
 
 #define pixel_t uint32_t;
 
 struct wl_buffer*
-wayland_file_create_buffer(
-    const struct wayland_file* file,
+playland_file_create_buffer(
+    const struct playland_file* file,
     const i32 width,
     const i32 height
 ) {

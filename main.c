@@ -4,9 +4,7 @@
 #include <unistd.h>
 
 #include "./macros.h"
-#include "./wayland/wayland.h"
-#include "./wayland/wayland-window.h"
-#include "./wayland/wayland-shm.h"
+#include <playland/wayland.h>
 
 static bool done = false;
 
@@ -22,10 +20,22 @@ main() {
         return EXIT_FAILURE;
     }
 
-    const struct wayland_file* file = wayland_shm_create_file(wayland->shm, "images.bin");
+
+    const struct wayland_file* file = wayland_create_file(wayland->shm, "images.bin");
     if (! file) {
         return EXIT_FAILURE;
     }
+
+    const struct wl_buffer* window_buffer = wayland_file_create_buffer(file, 320, 200);
+    if (! buffer) {
+        return EXIT_FAILURE;
+    }
+
+    const struct wl_buffer* cursor_buffer = wayland_file_create_buffer(file, 100, 59);
+    if (! sprite_buffer) {
+        return EXIT_FAILURE;
+    }
+
     //
     // 1. Create window
     //
@@ -36,11 +46,6 @@ main() {
             return EXIT_FAILURE;
         }
 
-        const struct wl_buffer* buffer = wayland_file_create_buffer(file, 320, 200);
-        if (! buffer) {
-            wl_surface_destroy(surface);
-            return EXIT_FAILURE;
-        }
         wayland_bind_buffer(buffer, surface);
 
         window = wayland_shell_create_window(wayland->shell, surface, buffer);
@@ -58,11 +63,6 @@ main() {
             return EXIT_FAILURE;
         }
 
-        const struct wl_buffer* buffer = wayland_file_create_buffer(file, 100, 59);
-        if (! sprite_buffer) {
-            wl_surface_destroy(surface);
-            return EXIT_FAILURE;
-        }
         wayland_bind_buffer(buffer, surface);
 
         mouse = wayland_pointer_create_mouse(wayland->pointer, surface, buffer, 10, 35);
