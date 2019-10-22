@@ -4,87 +4,83 @@
 #include <unistd.h>
 
 #include "./macros.h"
-#include <playland/wayland.h>
+#include <playland/playland.h>
 
 static bool done = false;
+static i32 status = EXIT_SUCCESS;
+#define GOTO(symbol) (status = EXIT_FAILURE; goto symbol;)
 
 void
-on_button(u32 button) {
-	done = true;
-}
+on_button(u32 button);
 
 i32
 main() {
-	const struct wayland* wayland = wayland_create();
-    if (! wayland) {
-        return EXIT_FAILURE;
+    const struct playland* playland = playland_create();
+    if (! playland) {
+        GOTO(panic);
+    }
+    //
+    // 0. Create resource file and corresponding bufferes
+    //
+    const struct playland_file* images = playland_create_file(playland, "images.bin");
+    if (! images) {
+        GOTO(panic_playland);
     }
 
-
-    const struct wayland_file* file = wayland_create_file(wayland->shm, "images.bin");
-    if (! file) {
-        return EXIT_FAILURE;
-    }
-
-    const struct wl_buffer* window_buffer = wayland_file_create_buffer(file, 320, 200);
+    const struct wl_buffer* window_background = playland_file_create_buffer(images, 320, 200);
     if (! buffer) {
-        return EXIT_FAILURE;
+        GOTO(panic_images);
     }
 
-    const struct wl_buffer* cursor_buffer = wayland_file_create_buffer(file, 100, 59);
+    const struct wl_buffer* cursor_sprite = playland_file_create_buffer(images, 100, 59);
     if (! sprite_buffer) {
-        return EXIT_FAILURE;
+        GOTO(panic_window_background);
     }
-
     //
     // 1. Create window
     //
-    struct wayland_window* window = NULL;
-    {
-        const struct wl_surface* surface = wl_compositor_create_surface(wayland->compositor);
-        if (! window_surface) {
-            return EXIT_FAILURE;
-        }
-
-        wayland_bind_buffer(buffer, surface);
-
-        window = wayland_shell_create_window(wayland->shell, surface, buffer);
-        if (! window) {
-            return EXIT_FAILURE;
-        }
+    const struct playland_window*  window = playlandcreate_window(playland);
+    if (! window) {
+        GOTO(panic_cursor_sprite);
     }
+    playland_window_set_background(window, window_background);
     //
-    // 2. Create mouse
+    // 2. Create cursor
     //
-    struct wayland_mouse* mouse = NULL;
-    {
-        const struct wl_surface* surface = wl_compositor_create_surface(wayland->compositor);
-        if (! sprite_surface) {
-            return EXIT_FAILURE;
-        }
-
-        wayland_bind_buffer(buffer, surface);
-
-        mouse = wayland_pointer_create_mouse(wayland->pointer, surface, buffer, 10, 35);
-        if (! mouse) {
-            return EXIT_FAILURE;
-        }
-        wayland_mouse_on_button(mouse, on_button);
+    const struct playland_cursor* cursor = playland_create_cursor(playland);
+    if (! cursor) {
+        GOTO(panic_window);
     }
+    cursor->on_button = on_button;
+    playland_cursor_set_sprite(cursor, cursor_sprite);
     //
     // 3. Listen for events
     //
     while (! done) {
-        done = wayland_display_listen(wayland->display);
+        done = playland_listen(playland);
     }
-
     //
-    // Cleanup
+    // 4. Cleanup
     //
-    wayland_pointer_destroy_mouse(mouse);
-    wayland_shell_destroy_window(window);
-    wayland_shm_destroy_file(file);
-	wayland_free(wayland);
+    playland_destroy_cursor(cursor);
+panic_window:
+    playland_destroy_window(window)
+panic_cursor_sprite:
+    wl_buffer_destroy(cursor_sprite)
+panic_window_background:
+    wl_buffer_destroy(window_background);
+panic_images:
+    playland_destroy_file(images);
+panic_playland:
+    playland_destroy(playland);
+panic:
+    //
+    // 5. Exit
+    //
+    return status;
+}
 
-    return EXIT_SUCCESS;
+void
+on_button(u32 button) {
+    done = true;
 }

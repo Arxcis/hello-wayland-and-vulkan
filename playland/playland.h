@@ -4,6 +4,7 @@
 #include <wayland-client.h>
 #include <playland/playland-file.h>
 #include <playland/playland-window.h>
+#include <playland/playland-cursor.h>
 
 struct playland {
    /**
@@ -23,29 +24,28 @@ struct playland {
 struct playland*
 playland_create();
 
-bool
-playland_display_listen(const struct playland* playland);
-
-void
-playland_free(const struct playland*);
-
 struct playland_file*
 playland_create_file(const struct playland*, const char* filepath);
 
-void
-playland_destroy_file(const struct playland_file*);
-
 struct playland_window*
 playland_create_window(const struct playland*);
-
-void
-playland_destroy_window(const struct playland_window*);
 
 struct playland_cursor*
 playland_create_cursor(const struct playland*);
 
 void
+playland_destroy(const struct playland*);
+
+void
+playland_destroy_file(const struct playland_file*);
+
+void
+playland_destroy_window(const struct playland_window*);
+
+void
 playland_destroy_cursor(const struct playland_cursor*);
 
+bool
+playland_display_listen(const struct playland* playland);
 
 #endif

@@ -109,8 +109,14 @@ playland_destroy_file(const struct playland_file* file) {
 
 struct playland_window*
 playland_create_window(const struct playland* playland) {
-    struct wl_shell_surface* shell_surface = wl_shell_get_shell_surface(playland->shell, surface);
-    if (shell_surface == NULL) {
+
+    const struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
+    if (! window_surface) {
+        return NULL;
+    }
+
+    const struct wl_shell_surface* shell_surface = wl_shell_get_shell_surface(playland->shell, surface);
+    if (! shell_surface) {
         return NULL;
     }
 
@@ -136,13 +142,20 @@ playland_destroy_window(const struct playland_window* window) {
     // shell surface must be destroyed before the surface
     wl_shell_surface_destroy(window->shell_surface);
     wl_surface_destroy(window->surface);
-    free(data);
+    free(window);
 }
 
 
 struct playland_cursor*
 playland_create_cusor(const struct playland* playland) {
+    const struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
+    if (! sprite_surface) {
+        return EXIT_FAILURE;
+    }
 
+    const struct playland_cursor* cursor = malloc(sizeof(playland_cursor));
+
+    return cursor;
 }
 
 void
