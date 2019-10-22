@@ -14,4 +14,7 @@ playland_window_set_background(
     struct wl_buffer* buffer
 );
 
+extern const struct wl_shell_surface_listener shell_surface_listener;
+
+
 #endif

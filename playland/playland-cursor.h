@@ -12,4 +12,6 @@ struct playland_cursor {
     void (*on_button)(unsigned);
 };
 
+extern const struct wl_pointer_listener pointer_listener;
+
 #endif

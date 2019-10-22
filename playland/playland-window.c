@@ -9,3 +9,26 @@ playland_window_set_background(
     wl_surface_commit(window->surface);
 }
 
+static void
+shell_surface_ping(
+    void* data,
+    struct wl_shell_surface* shell_surface,
+    unsigned serial
+) {
+    wl_shell_surface_pong(shell_surface, serial);
+}
+
+static void
+shell_surface_configure(
+    void* data,
+    struct wl_shell_surface* shell_surface,
+    unsigned edges,
+    int width,
+    int height
+) { }
+
+static const struct wl_shell_surface_listener
+shell_surface_listener = {
+    .ping = shell_surface_ping,
+    .configure = shell_surface_configure,
+};
