@@ -1,8 +1,7 @@
-#ifndef _TYPES_H_
-#define _TYPES_H_
+#ifndef _MACROS_H_
+#define _MACROS_H_
 
 #include <sys/types.h>
-#include <wayland-client.h>
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))

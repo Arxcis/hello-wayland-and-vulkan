@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "./types.h"
+#include "./macros.h"
 #include "./wayland/wayland.h"
 #include "./wayland/wayland-window.h"
 #include "./wayland/wayland-shm.h"
