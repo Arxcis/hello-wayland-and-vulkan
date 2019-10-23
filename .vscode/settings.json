@@ -2,6 +2,7 @@
   "files.associations": {
     "wayland-client.h": "c",
     "playland.h": "c",
-    "playland-file.h": "c"
+    "playland-file.h": "c",
+    "signal.h": "c"
   }
 }

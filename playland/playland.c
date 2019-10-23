@@ -11,12 +11,11 @@
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
-static struct playland* playland = NULL;
 static const struct wl_registry_listener registry_listener;
 
 struct playland*
 playland_create() {
-    playland = malloc(sizeof(struct playland));
+    struct playland* playland = malloc(sizeof(struct playland));
 
     playland->display = wl_display_connect(NULL);
     if (playland->display == NULL) {
@@ -28,7 +27,7 @@ playland_create() {
     wl_registry_add_listener(
         registry,
         &registry_listener,
-        NULL
+        playland
     );
     wl_display_roundtrip(playland->display);
     wl_registry_destroy(registry);
@@ -106,7 +105,7 @@ playland_destroy_file(struct playland_file* file) {
 
 
 struct playland_window*
-playland_create_window(const struct playland* playland) {
+playland_create_window(const struct playland* playland, const char* title) {
 
     struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
     if (! surface) {
@@ -117,6 +116,7 @@ playland_create_window(const struct playland* playland) {
     if (! shell_surface) {
         return NULL;
     }
+    wl_shell_surface_set_title(shell_surface, title);
 
     wl_shell_surface_add_listener(
         shell_surface,
@@ -145,10 +145,7 @@ playland_destroy_window(struct playland_window* window) {
 
 
 struct playland_cursor*
-playland_create_cursor(
-    const struct playland* playland, 
-    const playland_cursor_on_button_t on_button
-) {
+playland_create_cursor(const struct playland* playland) {
     struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
     if (! surface) {
         return NULL;
@@ -156,7 +153,6 @@ playland_create_cursor(
 
     struct playland_cursor* cursor = malloc(sizeof(struct playland_cursor));
     cursor->surface = surface;
-    cursor->on_button = on_button;
 
     wl_pointer_set_user_data(playland->pointer, cursor);
 
@@ -169,6 +165,17 @@ playland_destroy_cursor(struct playland_cursor* cursor) {
     free(cursor);
 }
 
+
+struct playland_keyboard*
+playland_create_keyboard(const struct playland* playland)
+{
+    struct playland_keyboard* keyboard = malloc(sizeof(struct playland_keyboard));
+
+    wl_keyboard_set_user_data(playland->keyboard, keyboard);
+
+    return keyboard;
+}
+ 
 //
 // Setup registry listeners
 //
@@ -180,6 +187,8 @@ registry_global(
     const char* interface,
     uint32_t version
 ) {
+    struct playland* const playland = data;
+
     if (strcmp(interface, wl_compositor_interface.name) == 0)
         playland->compositor = wl_registry_bind(
         	registry,
@@ -201,6 +210,13 @@ registry_global(
             &wl_shell_interface,
             min(version, 1)
         );
+    else if (strcmp(interface, wl_output_interface.name) == 0)
+        playland->output = wl_registry_bind(
+        	registry,
+        	name,
+            &wl_output_interface,
+            min(version, 2)
+        );
     else if (strcmp(interface, wl_seat_interface.name) == 0) {
         playland->seat = wl_registry_bind(
         	registry,
@@ -209,10 +225,17 @@ registry_global(
             min(version, 2)
         );
         playland->pointer = wl_seat_get_pointer(playland->seat);
+        playland->keyboard = wl_seat_get_keyboard(playland->seat);
+
+        wl_keyboard_add_listener(
+            playland->keyboard,
+            &playland_keyboard_listener,
+            playland
+        );
         wl_pointer_add_listener(
         	playland->pointer,
         	&pointer_listener,
-            NULL
+            playland
         );
     }
 }

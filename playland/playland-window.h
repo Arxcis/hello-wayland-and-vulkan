@@ -16,5 +16,4 @@ playland_window_set_background(
 
 extern const struct wl_shell_surface_listener shell_surface_listener;
 
-
 #endif

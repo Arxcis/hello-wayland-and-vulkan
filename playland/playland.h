@@ -6,6 +6,7 @@
 #include "./playland-file.h"
 #include "./playland-window.h"
 #include "./playland-cursor.h"
+#include "./playland-keyboard.h"
 
 struct playland {
    /**
@@ -20,6 +21,8 @@ struct playland {
     struct wl_shell* shell;
     struct wl_shm* shm;
     struct wl_pointer* pointer;
+    struct wl_keyboard* keyboard;
+    struct wl_output* output;
 };
 
 struct playland*
@@ -29,13 +32,13 @@ struct playland_file*
 playland_create_file(const struct playland* playland, const char* filepath);
 
 struct playland_window*
-playland_create_window(const struct playland* playland);
+playland_create_window(const struct playland* playland, const char* title);
 
 struct playland_cursor*
-playland_create_cursor(
-    const struct playland* playland, 
-    const playland_cursor_on_button_t on_button
-);
+playland_create_cursor(const struct playland* playland);
+
+struct playland_keyboard*
+playland_create_keyboard(const struct playland* playland);
 
 bool
 playland_listen(const struct playland* playland);
