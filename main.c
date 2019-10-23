@@ -6,7 +6,7 @@
 
 #include "./playland/playland.h"
 
-static bool done = false;
+static bool click = false;
 static int status = EXIT_SUCCESS;
 #define GOTO(symbol) {\
     status = EXIT_FAILURE;\
@@ -14,8 +14,8 @@ static int status = EXIT_SUCCESS;
 }
 
 void
-on_button(unsigned button) {
-    done = true;
+on_button(unsigned int button) {
+    click = true;
 }
 
 int
@@ -52,18 +52,17 @@ main() {
     //
     // 2. Create cursor
     //
-    struct playland_cursor* const cursor = playland_create_cursor(playland);
+    struct playland_cursor* const cursor = playland_create_cursor(playland, on_button);
     if (! cursor) {
         GOTO(panic_window);
-    }
-    cursor->on_button = on_button;
-    cursor->sprite = cursor_sprite;
-    cursor->hotspot_x = 35;
-    cursor->hotspot_y = 10;
+    }   
+    playland_cursor_set_sprite(cursor, cursor_sprite, 35, 10);
+
     //
     // 3. Listen for events
     //
-    while (! done) {
+    bool done = false;
+    while (! done && ! click) {
         done = playland_listen(playland);
     }
     //

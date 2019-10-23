@@ -145,13 +145,19 @@ playland_destroy_window(struct playland_window* window) {
 
 
 struct playland_cursor*
-playland_create_cursor(const struct playland* playland) {
+playland_create_cursor(
+    const struct playland* playland, 
+    const playland_cursor_on_button_t on_button
+) {
     struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
     if (! surface) {
         return NULL;
     }
 
     struct playland_cursor* cursor = malloc(sizeof(struct playland_cursor));
+    cursor->surface = surface;
+    cursor->on_button = on_button;
+
     wl_pointer_set_user_data(playland->pointer, cursor);
 
     return cursor;

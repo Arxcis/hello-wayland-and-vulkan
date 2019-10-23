@@ -27,7 +27,7 @@ shell_surface_configure(
     int height
 ) { }
 
-static const struct wl_shell_surface_listener
+const struct wl_shell_surface_listener
 shell_surface_listener = {
     .ping = shell_surface_ping,
     .configure = shell_surface_configure,

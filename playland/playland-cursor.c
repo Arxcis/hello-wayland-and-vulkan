@@ -1,5 +1,20 @@
 #include "./playland-cursor.h"
 
+void
+playland_cursor_set_sprite(
+    struct playland_cursor* const cursor, 
+    struct wl_buffer* const sprite,
+    const int hotspot_x,
+    const int hotspot_y
+) {
+    cursor->hotspot_x = hotspot_x;
+    cursor->hotspot_y = hotspot_y;
+    cursor->sprite = sprite;
+    wl_surface_attach(cursor->surface, sprite, 0, 0);
+    wl_surface_commit(cursor->surface);
+}
+
+
 static void
 pointer_enter(
     void* data,
@@ -20,8 +35,8 @@ pointer_enter(
         pointer,
         serial,
         cursor->surface,
-        cursor->hot_spot_x,
-        cursor->hot_spot_y
+        cursor->hotspot_x,
+        cursor->hotspot_y
     );
 }
 

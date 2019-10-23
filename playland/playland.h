@@ -32,7 +32,10 @@ struct playland_window*
 playland_create_window(const struct playland* playland);
 
 struct playland_cursor*
-playland_create_cursor(const struct playland* playland);
+playland_create_cursor(
+    const struct playland* playland, 
+    const playland_cursor_on_button_t on_button
+);
 
 bool
 playland_listen(const struct playland* playland);
