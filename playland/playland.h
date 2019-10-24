@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "./playland-file.h"
 #include "./playland-window.h"
-#include "./playland-cursor.h"
+#include "./playland-pointer.h"
 #include "./playland-keyboard.h"
 
 struct playland {

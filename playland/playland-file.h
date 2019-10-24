@@ -5,9 +5,9 @@
 #define pixel_t uint32_t
 
 struct playland_file {
-    int      fd;
-    unsigned capacity;
-    unsigned size;
+    int32_t  fd;
+    uint32_t capacity;
+    uint32_t size;
     pixel_t* memory;
     struct wl_shm_pool* pool;
 };
@@ -15,8 +15,8 @@ struct playland_file {
 struct wl_buffer*
 playland_file_create_buffer(
     struct playland_file* file,
-    const int width,
-    const int height
+    const int32_t width,
+    const int32_t height
 );
 
 #endif

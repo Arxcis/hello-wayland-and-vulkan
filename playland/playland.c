@@ -244,7 +244,7 @@ static void
 registry_global_remove(
 	void* a,
     struct wl_registry* b,
-    unsigned c
+    uint32_t c
 ) { }
 
 

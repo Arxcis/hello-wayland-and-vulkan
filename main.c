@@ -17,7 +17,7 @@ sigHandler(int dummy) {
 
 void
 on_button(uint32_t button) {
-    // click = true;
+    // quit = 1;
 }
 
 void
@@ -25,11 +25,11 @@ on_key(void* _playland, void* _window, uint32_t key) {
 
     struct playland_window* window = _window;
 
-    const int Escape = 1;
-    const int KeyF = 33;
-    const int KeyG = 34;
-    const int KeyM = 50;
-    const int KeyN = 49;
+    const uint32_t Escape = 1;
+    const uint32_t KeyF = 33;
+    const uint32_t KeyG = 34;
+    const uint32_t KeyM = 50;
+    const uint32_t KeyN = 49;
 
     if (key == Escape) {
         quit = 1;

@@ -4,8 +4,8 @@
 struct wl_buffer*
 playland_file_create_buffer(
     struct playland_file* file,
-    const int width,
-    const int height
+    const int32_t width,
+    const int32_t height
 ) {
     static const unsigned PIXEL_FORMAT_ID = WL_SHM_FORMAT_ARGB8888;
 
