@@ -144,25 +144,25 @@ playland_destroy_window(struct playland_window* window) {
 }
 
 
-struct playland_cursor*
-playland_create_cursor(const struct playland* playland) {
+struct playland_pointer*
+playland_create_pointer(const struct playland* playland) {
     struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
     if (! surface) {
         return NULL;
     }
 
-    struct playland_cursor* cursor = malloc(sizeof(struct playland_cursor));
-    cursor->surface = surface;
+    struct playland_pointer* pointer = malloc(sizeof(struct playland_pointer));
+    pointer->surface = surface;
 
-    wl_pointer_set_user_data(playland->pointer, cursor);
+    wl_pointer_set_user_data(playland->pointer, pointer);
 
-    return cursor;
+    return pointer;
 }
 
 void
-playland_destroy_cursor(struct playland_cursor* cursor) {
-    wl_surface_destroy(cursor->surface);
-    free(cursor);
+playland_destroy_pointer(struct playland_pointer* pointer) {
+    wl_surface_destroy(pointer->surface);
+    free(pointer);
 }
 
 
@@ -175,7 +175,7 @@ playland_create_keyboard(const struct playland* playland)
 
     return keyboard;
 }
- 
+
 //
 // Setup registry listeners
 //

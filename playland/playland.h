@@ -34,7 +34,7 @@ playland_create_file(const struct playland* playland, const char* filepath);
 struct playland_window*
 playland_create_window(const struct playland* playland, const char* title);
 
-struct playland_cursor*
+struct playland_pointer*
 playland_create_cursor(const struct playland* playland);
 
 struct playland_keyboard*
@@ -53,6 +53,6 @@ void
 playland_destroy_window(struct playland_window* window);
 
 void
-playland_destroy_cursor(struct playland_cursor* cursor);
+playland_destroy_cursor(struct playland_pointer* pointer);
 
 #endif

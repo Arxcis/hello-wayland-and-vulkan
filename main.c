@@ -70,36 +70,36 @@ main() {
 
     playland = playland_create();
     if (! playland) {
-        GOTO(panic);
+        GOTO(free_nothing);
     }
     struct playland_file* const images = playland_create_file(playland, "images.bin");
     if (! images) {
-        GOTO(panic_playland);
+        GOTO(free_playland);
     }
     struct wl_buffer* const window_background = playland_file_create_buffer(images, 320, 200);
     if (! window_background) {
-        GOTO(panic_images);
+        GOTO(free_images);
     }
-    struct wl_buffer* const cursor_sprite = playland_file_create_buffer(images, 100, 59);
-    if (! cursor_sprite) {
-        GOTO(panic_window_background);
+    struct wl_buffer* const pointer_cursor = playland_file_create_buffer(images, 100, 59);
+    if (! pointer_cursor) {
+        GOTO(free_window_background);
     }
     struct playland_window* const  window = playland_create_window(playland, "Main window");
     if (! window) {
-        GOTO(panic_cursor_sprite);
+        GOTO(free_pointer_cursor);
     }
     playland_window_set_background(window, window_background);
 
-    struct playland_cursor* const cursor = playland_create_cursor(playland);
-    if (! cursor) {
-        GOTO(panic_window);
+    struct playland_pointer* const pointer = playland_create_pointer(playland);
+    if (! pointer) {
+        GOTO(free_window);
     }
-    cursor->on_button = on_button;
-    playland_cursor_set_sprite(cursor, cursor_sprite, 35, 10);
+    pointer->on_button = on_button;
+    playland_pointer_set_cursor(pointer, pointer_cursor, 35, 10);
 
     struct playland_keyboard* const keyboard = playland_create_keyboard(playland);
     if (! keyboard) {
-        GOTO(panic_cursor);
+        GOTO(free_cursor);
     }
     keyboard->on_key = on_key;
     keyboard->on_key_payload = window;
@@ -114,18 +114,18 @@ main() {
     // Cleanup
     //
     free(keyboard);
-panic_cursor:
+free_cursor:
     playland_destroy_cursor(cursor);
-panic_window:
+free_window:
     playland_destroy_window(window);
-panic_cursor_sprite:
-    wl_buffer_destroy(cursor_sprite);
-panic_window_background:
+free_pointer_cursor:
+    wl_buffer_destroy(pointer_cursor);
+free_window_background:
     wl_buffer_destroy(window_background);
-panic_images:
+free_images:
     playland_destroy_file(images);
-panic_playland:
+free_playland:
     playland_destroy(playland);
-panic:
+free_nothing:
     return status;
 }

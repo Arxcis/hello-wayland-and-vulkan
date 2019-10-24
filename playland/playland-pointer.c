@@ -1,42 +1,42 @@
-#include "./playland-cursor.h"
+#include "./playland-pointer.h"
 
 void
-playland_cursor_set_sprite(
-    struct playland_cursor* const cursor, 
-    struct wl_buffer* const sprite,
+playland_pointer_set_cursor(
+    struct playland_pointer* const pointer,
+    struct wl_buffer* const cursor,
     const int hotspot_x,
     const int hotspot_y
 ) {
-    cursor->hotspot_x = hotspot_x;
-    cursor->hotspot_y = hotspot_y;
-    cursor->sprite = sprite;
-    wl_surface_attach(cursor->surface, sprite, 0, 0);
-    wl_surface_commit(cursor->surface);
+    pointer->hotspot_x = hotspot_x;
+    pointer->hotspot_y = hotspot_y;
+    pointer->cursor = cursor;
+    wl_surface_attach(pointer->surface, cursor, 0, 0);
+    wl_surface_commit(pointer->surface);
 }
 
 
 static void
 pointer_enter(
     void* data,
-    struct wl_pointer* pointer,
+    struct wl_pointer* _pointer,
     unsigned serial,
     struct wl_surface* surface,
     wl_fixed_t surface_x,
     wl_fixed_t surface_y
 ) {
-    struct playland_cursor* cursor = wl_pointer_get_user_data(pointer);
+    struct playland_pointer* pointer = wl_pointer_get_user_data(_pointer);
 
-    cursor->target_surface = surface;
+    pointer->target_surface = surface;
 
-    wl_surface_attach(cursor->surface, cursor->sprite, 0, 0);
-    wl_surface_commit(cursor->surface);
+    wl_surface_attach(pointer->surface, pointer->cursor, 0, 0);
+    wl_surface_commit(pointer->surface);
 
     wl_pointer_set_cursor(
         pointer,
         serial,
-        cursor->surface,
-        cursor->hotspot_x,
-        cursor->hotspot_y
+        pointer->surface,
+        pointer->hotspot_x,
+        pointer->hotspot_y
     );
 }
 
@@ -66,12 +66,12 @@ pointer_button(
     unsigned button,
     unsigned state
 ) {
-    struct playland_cursor* cursor = wl_pointer_get_user_data(pointer);
-    if (cursor->on_button == NULL) {
+    struct playland_pointer* pointer = wl_pointer_get_user_data(pointer);
+    if (pointer->on_button == NULL) {
         return;
     }
 
-    cursor->on_button(button);
+    pointer->on_button(button);
 }
 
 static void
