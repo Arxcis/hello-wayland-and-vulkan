@@ -32,7 +32,7 @@ pointer_enter(
     wl_surface_commit(pointer->surface);
 
     wl_pointer_set_cursor(
-        pointer,
+        _pointer,
         serial,
         pointer->surface,
         pointer->hotspot_x,
@@ -60,13 +60,13 @@ pointer_motion(
 static void
 pointer_button(
     void* data,
-    struct wl_pointer* pointer,
+    struct wl_pointer* _pointer,
     uint32_t serial,
     uint32_t time,
     uint32_t button,
     uint32_t state
 ) {
-    struct playland_pointer* pointer = wl_pointer_get_user_data(pointer);
+    struct playland_pointer* pointer = wl_pointer_get_user_data(_pointer);
     if (pointer->on_button == NULL) {
         return;
     }

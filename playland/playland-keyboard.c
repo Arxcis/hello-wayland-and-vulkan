@@ -14,7 +14,7 @@ keyboard_key(
     if (keyboard->on_key == NULL) {
         return;
     }
-    keyboard->on_key(data, keyboard->on_key_payload, key);
+    keyboard->on_key(keyboard->on_key_payload, key);
 }
 
 static void

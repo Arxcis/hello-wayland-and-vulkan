@@ -3,7 +3,7 @@
 
 #include <wayland-client.h>
 
-typedef void (*playland_keybaord_on_key_t)(void*, void*, uint32_t);
+typedef void (*playland_keybaord_on_key_t)(void*, uint32_t);
 
 struct playland_keyboard {
     playland_keybaord_on_key_t on_key;

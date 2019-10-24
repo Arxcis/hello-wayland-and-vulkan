@@ -21,7 +21,7 @@ on_button(uint32_t button) {
 }
 
 void
-on_key(void* _playland, void* _window, uint32_t key) {
+on_key(void* _window, uint32_t key) {
 
     struct playland_window* window = _window;
 
@@ -37,7 +37,7 @@ on_key(void* _playland, void* _window, uint32_t key) {
     if (key == KeyF) {
         wl_shell_surface_set_fullscreen(
             window->shell_surface,
-            WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT,
+            WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE,
             120000,
             playland->output
         );
@@ -115,7 +115,7 @@ main() {
     //
     free(keyboard);
 free_cursor:
-    playland_destroy_cursor(cursor);
+    playland_destroy_pointer(pointer);
 free_window:
     playland_destroy_window(window);
 free_pointer_cursor:
