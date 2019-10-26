@@ -24,7 +24,7 @@ void
 on_button(struct playland_window* target, uint32_t serial, uint32_t button, enum playland_pointer_state state);
 
 void
-on_key(struct playland_window* target, uint32_t key);
+on_key(struct playland_window* target, enum playland_keyboard_key key);
 
 #define GOTO(symbol) {\
     status = EXIT_FAILURE;\
@@ -105,7 +105,7 @@ free_nothing:
 
 void
 signal_handler(int dummy) {
-    
+
     perror("Quitting gracefully...\n");
     quit = 1;
 }
@@ -128,19 +128,12 @@ on_button(
 void
 on_key(
     struct playland_window* target, 
-    uint32_t key
+    enum playland_keyboard_key key
 ) {
-
-    const uint32_t Escape = 1;
-    const uint32_t KeyF = 33;
-    const uint32_t KeyG = 34;
-    const uint32_t KeyM = 50;
-    const uint32_t KeyN = 49;
-
-    if (key == Escape) {
+    if (key == PLAYLAND_KEYBOARD_ESCAPE) {
         quit = 1;
     }
-    if (key == KeyF) {
+    if (key == PLAYLAND_KEYBOARD_F) {
         wl_shell_surface_set_fullscreen(
             target->shell_surface,
             WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE,
@@ -148,13 +141,13 @@ on_key(
             target->playland->output
         );
     }
-    if (key == KeyG) {
+    if (key == PLAYLAND_KEYBOARD_G) {
         wl_shell_surface_set_toplevel(target->shell_surface);
     }
-    if (key == KeyM) {
+    if (key == PLAYLAND_KEYBOARD_M) {
         wl_shell_surface_set_maximized(target->shell_surface, target->playland->output);
     }
-    if (key == KeyN) {
+    if (key == PLAYLAND_KEYBOARD_N) {
         wl_shell_surface_set_toplevel(target->shell_surface);
     }
 }

@@ -4,7 +4,16 @@
 #include "./playland.h"
 #include "./playland-window.h"
 
-typedef void (*playland_keybaord_on_key_t)(struct playland_window*, uint32_t);
+
+enum playland_keyboard_key {
+    PLAYLAND_KEYBOARD_ESCAPE = 1,
+    PLAYLAND_KEYBOARD_F = 33,
+    PLAYLAND_KEYBOARD_G = 34,
+    PLAYLAND_KEYBOARD_M = 50,
+    PLAYLAND_KEYBOARD_N = 49,
+};
+
+typedef void (*playland_keybaord_on_key_t)(struct playland_window*, enum playland_keyboard_key);
 
 struct playland_keyboard {
     playland_keybaord_on_key_t on_key;
