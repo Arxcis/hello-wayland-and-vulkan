@@ -1,0 +1,6 @@
+#!/usr/bin/sh
+
+clear
+export WAYLAND_DEBUG=1 
+gcc main.c playland/*.c -o ./bin/main -lwayland-client
+./bin/main 
