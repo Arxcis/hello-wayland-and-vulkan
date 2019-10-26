@@ -119,8 +119,8 @@ on_button(
 ) {
     if (state == PLAYLAND_POINTER_UP) {
 
-    } else
-    if (state == PLAYLAND_POINTER_DOWN) {
+    }
+    else if (state == PLAYLAND_POINTER_DOWN) {
         wl_shell_surface_move(target->shell_surface, target->playland->seat, serial);
     }
 }
