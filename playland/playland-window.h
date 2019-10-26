@@ -21,6 +21,4 @@ playland_window_create(struct playland* playland, const char* title);
 void
 playland_window_destroy(struct playland_window* window);
 
-extern const struct wl_shell_surface_listener shell_surface_listener;
-
 #endif

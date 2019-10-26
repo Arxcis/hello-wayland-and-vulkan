@@ -1,6 +1,9 @@
 #include "./playland-window.h"
 #include <stdlib.h>
 
+static const struct wl_shell_surface_listener
+playland_window_listener;
+
 struct playland_window*
 playland_window_create(struct playland* playland, const char* title) {
 
@@ -17,7 +20,7 @@ playland_window_create(struct playland* playland, const char* title) {
 
     wl_shell_surface_add_listener(
         shell_surface,
-        &shell_surface_listener,
+        &playland_window_listener,
         0
     );
     wl_shell_surface_set_toplevel(shell_surface);
@@ -68,8 +71,8 @@ shell_surface_configure(
     int32_t height
 ) { }
 
-const struct wl_shell_surface_listener
-shell_surface_listener = {
+static const struct wl_shell_surface_listener
+playland_window_listener = {
     .ping = shell_surface_ping,
     .configure = shell_surface_configure,
 };

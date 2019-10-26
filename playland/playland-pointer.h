@@ -19,6 +19,7 @@ struct playland_pointer {
     int32_t hotspot_y;
     playland_pointer_on_button_t on_button;
 };
+
 struct playland_pointer*
 playland_pointer_create(struct playland* playland);
 
@@ -33,9 +34,7 @@ playland_pointer_set_cursor(
     const int32_t hotspot_y
 );
 
-
-
-
-extern const struct wl_pointer_listener pointer_listener;
+extern const struct wl_pointer_listener
+pointer_listener;
 
 #endif

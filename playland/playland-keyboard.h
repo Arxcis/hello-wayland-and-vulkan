@@ -25,6 +25,7 @@ struct playland_keyboard {
 struct playland_keyboard*
 playland_keyboard_create(struct playland* playland);
 
-extern const struct wl_keyboard_listener playland_keyboard_listener;
+extern const struct wl_keyboard_listener
+playland_keyboard_listener;
 
 #endif
