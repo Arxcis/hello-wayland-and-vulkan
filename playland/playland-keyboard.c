@@ -63,8 +63,6 @@ keyboard_key(
     keyboard->on_key(target, key);
 }
 
-
-
 static void
 keyboard_modifiers(
     void *data,

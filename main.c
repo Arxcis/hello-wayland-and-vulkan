@@ -31,13 +31,12 @@ on_key(struct playland_window* target, uint32_t key);
 int
 main() {
     int status = EXIT_SUCCESS;
-    //
-    // Init
-    //
     signal(SIGINT, signal_handler);
     signal(SIGQUIT, signal_handler);
     signal(SIGTERM, signal_handler);
-
+    //
+    // 1. Initialize
+    //
     playland = playland_create();
     if (! playland) {
         GOTO(free_nothing);
@@ -54,7 +53,7 @@ main() {
     if (! pointer_cursor) {
         GOTO(free_window_background);
     }
-    struct playland_window* const  window = playland_window_create(playland, "Main window");
+    struct playland_window* const  window = playland_window_create(playland, "Playland");
     if (! window) {
         GOTO(free_pointer_cursor);
     }
@@ -74,14 +73,14 @@ main() {
     keyboard->on_key = on_key;
     keyboard->on_key_payload = window;
     //
-    // Loop
+    // 2. Loop
     //
     bool done = false;
     while (! done && ! quit) {
         done = playland_listen(playland);
     }
     //
-    // Cleanup
+    // 3. Cleanup
     //
     free(keyboard);
 free_cursor:
@@ -123,7 +122,6 @@ on_button(
 
 void
 on_key(struct playland_window* target, uint32_t key) {
-
 
     const uint32_t Escape = 1;
     const uint32_t KeyF = 33;
