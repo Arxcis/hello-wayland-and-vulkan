@@ -14,6 +14,9 @@
 static struct playland* playland = NULL;
 volatile sig_atomic_t quit = 0;
 
+int
+main(const int argc, const char** argv);
+
 void
 signal_handler(int dummy);
 
@@ -29,7 +32,8 @@ on_key(struct playland_window* target, uint32_t key);
 }
 
 int
-main() {
+main(const int argc, const char** argv) {
+    
     int status = EXIT_SUCCESS;
     signal(SIGINT, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -101,6 +105,7 @@ free_nothing:
 
 void
 signal_handler(int dummy) {
+    
     perror("Quitting gracefully...\n");
     quit = 1;
 }
@@ -121,7 +126,10 @@ on_button(
 }
 
 void
-on_key(struct playland_window* target, uint32_t key) {
+on_key(
+    struct playland_window* target, 
+    uint32_t key
+) {
 
     const uint32_t Escape = 1;
     const uint32_t KeyF = 33;
