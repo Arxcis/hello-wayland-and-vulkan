@@ -33,7 +33,7 @@ on_key(struct playland_window* target, enum playland_keyboard_key key);
 
 int
 main(const int argc, const char** argv) {
-    
+
     int status = EXIT_SUCCESS;
     signal(SIGINT, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -112,9 +112,9 @@ signal_handler(int dummy) {
 
 void
 on_button(
-    struct playland_window* target, 
-    uint32_t serial, 
-    uint32_t button, 
+    struct playland_window* target,
+    uint32_t serial,
+    uint32_t button,
     enum playland_pointer_state state
 ) {
     if (state == PLAYLAND_POINTER_UP) {
@@ -127,27 +127,27 @@ on_button(
 
 void
 on_key(
-    struct playland_window* target, 
+    struct playland_window* target,
     enum playland_keyboard_key key
 ) {
     if (key == PLAYLAND_KEYBOARD_ESCAPE) {
         quit = 1;
-    } else 
-    if (key == PLAYLAND_KEYBOARD_F) {
+    }
+    else if (key == PLAYLAND_KEYBOARD_F) {
         wl_shell_surface_set_fullscreen(
             target->shell_surface,
             WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE,
             120000,
             target->playland->output
         );
-    } else 
-    if (key == PLAYLAND_KEYBOARD_G) {
+    }
+    else if (key == PLAYLAND_KEYBOARD_G) {
         wl_shell_surface_set_toplevel(target->shell_surface);
-    } else
-    if (key == PLAYLAND_KEYBOARD_M) {
+    }
+    else if (key == PLAYLAND_KEYBOARD_M) {
         wl_shell_surface_set_maximized(target->shell_surface, target->playland->output);
-    } else
-    if (key == PLAYLAND_KEYBOARD_N) {
+    }
+    else if (key == PLAYLAND_KEYBOARD_N) {
         wl_shell_surface_set_toplevel(target->shell_surface);
     }
 }
