@@ -132,7 +132,7 @@ on_key(
 ) {
     if (key == PLAYLAND_KEYBOARD_ESCAPE) {
         quit = 1;
-    }
+    } else 
     if (key == PLAYLAND_KEYBOARD_F) {
         wl_shell_surface_set_fullscreen(
             target->shell_surface,
@@ -140,13 +140,13 @@ on_key(
             120000,
             target->playland->output
         );
-    }
+    } else 
     if (key == PLAYLAND_KEYBOARD_G) {
         wl_shell_surface_set_toplevel(target->shell_surface);
-    }
+    } else
     if (key == PLAYLAND_KEYBOARD_M) {
         wl_shell_surface_set_maximized(target->shell_surface, target->playland->output);
-    }
+    } else
     if (key == PLAYLAND_KEYBOARD_N) {
         wl_shell_surface_set_toplevel(target->shell_surface);
     }
