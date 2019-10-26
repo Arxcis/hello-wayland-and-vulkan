@@ -1,9 +1,15 @@
 #ifndef PLAYLAND_POINTER
 #define PLAYLAND_POINTER
 
-#include <wayland-client.h>
+#include "./playland.h"
+#include "./playland-window.h"
 
-typedef void (*playland_pointer_on_button_t)(uint32_t);
+enum playland_pointer_state {
+    PLAYLAND_POINTER_UP,
+    PLAYLAND_POINTER_DOWN,
+};
+
+typedef void (*playland_pointer_on_button_t)(struct playland_window*, uint32_t, uint32_t, enum playland_pointer_state);
 
 struct playland_pointer {
     struct wl_surface* surface;
@@ -13,6 +19,11 @@ struct playland_pointer {
     int32_t hotspot_y;
     playland_pointer_on_button_t on_button;
 };
+struct playland_pointer*
+playland_pointer_create(struct playland* playland);
+
+void
+playland_pointer_destroy(struct playland_pointer* pointer);
 
 void
 playland_pointer_set_cursor(
@@ -21,6 +32,9 @@ playland_pointer_set_cursor(
     const int32_t hotspot_x,
     const int32_t hotspot_y
 );
+
+
+
 
 extern const struct wl_pointer_listener pointer_listener;
 

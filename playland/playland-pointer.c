@@ -1,4 +1,27 @@
 #include "./playland-pointer.h"
+#include <stdlib.h>
+
+struct playland_pointer*
+playland_pointer_create(struct playland* playland) {
+    struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
+    if (! surface) {
+        return NULL;
+    }
+
+    struct playland_pointer* pointer = malloc(sizeof(struct playland_pointer));
+    pointer->surface = surface;
+
+    wl_pointer_set_user_data(playland->pointer, pointer);
+
+    return pointer;
+}
+
+void
+playland_pointer_destroy(struct playland_pointer* pointer) {
+    wl_surface_destroy(pointer->surface);
+    free(pointer);
+}
+
 
 void
 playland_pointer_set_cursor(
@@ -43,10 +66,14 @@ pointer_enter(
 static void
 pointer_leave(
     void* data,
-    struct wl_pointer* pointer,
+    struct wl_pointer* _pointer,
     uint32_t serial,
-    struct wl_surface* wl_surface
-) { }
+    struct wl_surface* surface
+) { 
+    struct playland_pointer* pointer = wl_pointer_get_user_data(_pointer);
+
+    pointer->target_surface = NULL;
+}
 
 static void
 pointer_motion(
@@ -70,8 +97,8 @@ pointer_button(
     if (pointer->on_button == NULL) {
         return;
     }
-
-    pointer->on_button(button);
+    struct playland_window* window = wl_surface_get_user_data(pointer->target_surface);
+    pointer->on_button(window, serial, button, state);
 }
 
 static void

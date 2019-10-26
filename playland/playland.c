@@ -1,13 +1,9 @@
 #include "playland.h"
+#include "./playland-pointer.h"
+#include "./playland-keyboard.h"
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
 #include <stdlib.h>
-#include <sys/mman.h>
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
@@ -54,126 +50,6 @@ playland_destroy(struct playland* playland) {
     wl_display_disconnect(playland->display);
 
     free(playland);
-}
-
-
-struct playland_file*
-playland_create_file(const struct playland* playland, const char* filepath) {
-    struct stat stat;
-
-    int fd = open(filepath, O_RDWR);
-    if (fd < 0) {
-        return NULL;
-    }
-
-    if (fstat(fd, &stat) != 0) {
-        return NULL;
-    }
-
-    struct playland_file* file = malloc(sizeof(struct playland_file));
-    if (file == NULL) {
-        return NULL;
-    }
-
-    file->capacity = stat.st_size;
-    file->size = 0;
-    file->fd = fd;
-
-    file->memory = mmap(0, file->capacity, PROT_READ, MAP_SHARED, file->fd, 0);
-    if (file->memory == MAP_FAILED) {
-        free(file);
-        return NULL;
-    }
-
-    file->pool = wl_shm_create_pool(playland->shm, file->fd, file->capacity);
-    if (file->pool == NULL) {
-        munmap(file->memory, file->capacity);
-        free(file);
-        return NULL;
-    }
-    close(fd);
-
-    return file;
-}
-
-void
-playland_destroy_file(struct playland_file* file) {
-    wl_shm_pool_destroy(file->pool);
-    munmap(file->memory, file->capacity);
-    free(file);
-}
-
-
-struct playland_window*
-playland_create_window(const struct playland* playland, const char* title) {
-
-    struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
-    if (! surface) {
-        return NULL;
-    }
-
-    struct wl_shell_surface* shell_surface = wl_shell_get_shell_surface(playland->shell, surface);
-    if (! shell_surface) {
-        return NULL;
-    }
-    wl_shell_surface_set_title(shell_surface, title);
-
-    wl_shell_surface_add_listener(
-        shell_surface,
-        &shell_surface_listener,
-        0
-    );
-    wl_shell_surface_set_toplevel(shell_surface);
-
-    struct playland_window* window = malloc(sizeof(struct playland_window));
-    window->surface = surface;
-    window->shell_surface = shell_surface;
-
-    wl_shell_surface_set_user_data(shell_surface, window);
-    wl_surface_set_user_data(surface, window);
-
-    return window;
-}
-
-void
-playland_destroy_window(struct playland_window* window) {
-    // shell surface must be destroyed before the surface
-    wl_shell_surface_destroy(window->shell_surface);
-    wl_surface_destroy(window->surface);
-    free(window);
-}
-
-
-struct playland_pointer*
-playland_create_pointer(const struct playland* playland) {
-    struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
-    if (! surface) {
-        return NULL;
-    }
-
-    struct playland_pointer* pointer = malloc(sizeof(struct playland_pointer));
-    pointer->surface = surface;
-
-    wl_pointer_set_user_data(playland->pointer, pointer);
-
-    return pointer;
-}
-
-void
-playland_destroy_pointer(struct playland_pointer* pointer) {
-    wl_surface_destroy(pointer->surface);
-    free(pointer);
-}
-
-
-struct playland_keyboard*
-playland_create_keyboard(const struct playland* playland)
-{
-    struct playland_keyboard* keyboard = malloc(sizeof(struct playland_keyboard));
-
-    wl_keyboard_set_user_data(playland->keyboard, keyboard);
-
-    return keyboard;
 }
 
 //

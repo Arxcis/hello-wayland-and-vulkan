@@ -3,6 +3,8 @@
     "wayland-client.h": "c",
     "playland.h": "c",
     "playland-file.h": "c",
-    "signal.h": "c"
+    "signal.h": "c",
+    "unistd.h": "c",
+    "stdlib.h": "c"
   }
 }
