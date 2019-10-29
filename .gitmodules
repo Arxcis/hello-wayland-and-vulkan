@@ -1,3 +1,6 @@
 [submodule "wayland"]
 	path = wayland
 	url = git@github.com:wayland-project/wayland.git
+[submodule "wayland-protocols"]
+	path = wayland-protocols
+	url = https://github.com/wayland-project/wayland-protocols
