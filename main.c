@@ -6,7 +6,7 @@
 #include <signal.h>
 
 #include "./playland/playland.h"
-#include "./playland/playland-file.h"
+#include "./playland/playland-pool.h"
 #include "./playland/playland-window.h"
 #include "./playland/playland-pointer.h"
 #include "./playland/playland-keyboard.h"
@@ -24,7 +24,7 @@ void
 on_button(struct playland_window* target, uint32_t serial, uint32_t button, enum playland_pointer_state state);
 
 void
-on_key(struct playland_window* target, enum playland_keyboard_key key);
+on_key(struct playland_window* target, enum playland_keyboard_key key, enum playland_keyboard_state state);
 
 #define GOTO(symbol) {\
     status = EXIT_FAILURE;\
@@ -45,37 +45,22 @@ main(const int argc, const char** argv) {
     if (! playland) {
         GOTO(free_nothing);
     }
-    struct playland_file* const images = playland_file_create(playland, "images.bin");
-    if (! images) {
-        GOTO(free_playland);
-    }
-    struct wl_buffer* const window_background = playland_file_create_buffer(images, 320, 200);
-    if (! window_background) {
-        GOTO(free_images);
-    }
-    struct wl_buffer* const pointer_cursor = playland_file_create_buffer(images, 100, 59);
-    if (! pointer_cursor) {
-        GOTO(free_window_background);
-    }
     struct playland_window* const  window = playland_window_create(playland, "Playland");
     if (! window) {
-        GOTO(free_pointer_cursor);
+        GOTO(free_playland);
     }
-    playland_window_set_background(window, window_background);
 
     struct playland_pointer* const pointer = playland_pointer_create(playland);
     if (! pointer) {
         GOTO(free_window);
     }
     pointer->on_button = on_button;
-    playland_pointer_set_cursor(pointer, pointer_cursor, 35, 10);
 
     struct playland_keyboard* const keyboard = playland_keyboard_create(playland);
     if (! keyboard) {
         GOTO(free_cursor);
     }
     keyboard->on_key = on_key;
-    keyboard->on_key_payload = window;
     //
     // 2. Loop
     //
@@ -91,12 +76,6 @@ free_cursor:
     playland_pointer_destroy(pointer);
 free_window:
     playland_window_destroy(window);
-free_pointer_cursor:
-    wl_buffer_destroy(pointer_cursor);
-free_window_background:
-    wl_buffer_destroy(window_background);
-free_images:
-    playland_file_destroy(images);
 free_playland:
     playland_destroy(playland);
 free_nothing:
@@ -128,8 +107,13 @@ on_button(
 void
 on_key(
     struct playland_window* target,
-    enum playland_keyboard_key key
+    enum playland_keyboard_key key,
+    enum playland_keyboard_state state
 ) {
+    if (state == PLAYLAND_KEYBOARD_STATE_UP) {
+        return;
+    }
+
     if (key == PLAYLAND_KEYBOARD_ESCAPE) {
         quit = 1;
     }

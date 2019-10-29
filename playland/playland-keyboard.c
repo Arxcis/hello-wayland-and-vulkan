@@ -31,7 +31,7 @@ keyboard_enter(
 	struct wl_array *keys
 ) {
 	struct playland_keyboard* keyboard = wl_keyboard_get_user_data(_keyboard);
-	keyboard->target = surface; 
+	keyboard->target = surface;
 }
 
 static void
@@ -60,7 +60,7 @@ keyboard_key(
         return;
     }
 	struct playland_window* target = wl_surface_get_user_data(keyboard->target);
-    keyboard->on_key(target, key);
+    keyboard->on_key(target, key, state);
 }
 
 static void

@@ -2,9 +2,13 @@
   "files.associations": {
     "wayland-client.h": "c",
     "playland.h": "c",
-    "playland-file.h": "c",
+    "playland-pool.h": "c",
     "signal.h": "c",
     "unistd.h": "c",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "xdg.h": "c",
+    "fcntl.h": "c",
+    "stdbool.h": "c",
+    "stddef.h": "c"
   }
 }

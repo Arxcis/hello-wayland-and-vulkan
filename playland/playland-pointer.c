@@ -3,13 +3,7 @@
 
 struct playland_pointer*
 playland_pointer_create(struct playland* playland) {
-    struct wl_surface* surface = wl_compositor_create_surface(playland->compositor);
-    if (! surface) {
-        return NULL;
-    }
-
     struct playland_pointer* pointer = malloc(sizeof(struct playland_pointer));
-    pointer->surface = surface;
 
     wl_pointer_set_user_data(playland->pointer, pointer);
 
@@ -18,7 +12,6 @@ playland_pointer_create(struct playland* playland) {
 
 void
 playland_pointer_destroy(struct playland_pointer* pointer) {
-    wl_surface_destroy(pointer->surface);
     free(pointer);
 }
 
@@ -30,11 +23,6 @@ playland_pointer_set_cursor(
     const int32_t hotspot_x,
     const int32_t hotspot_y
 ) {
-    pointer->hotspot_x = hotspot_x;
-    pointer->hotspot_y = hotspot_y;
-    pointer->cursor = cursor;
-    wl_surface_attach(pointer->surface, cursor, 0, 0);
-    wl_surface_commit(pointer->surface);
 }
 
 
@@ -48,19 +36,7 @@ pointer_enter(
     wl_fixed_t surface_y
 ) {
     struct playland_pointer* pointer = wl_pointer_get_user_data(_pointer);
-
     pointer->target_surface = surface;
-
-    wl_surface_attach(pointer->surface, pointer->cursor, 0, 0);
-    wl_surface_commit(pointer->surface);
-
-    wl_pointer_set_cursor(
-        _pointer,
-        serial,
-        pointer->surface,
-        pointer->hotspot_x,
-        pointer->hotspot_y
-    );
 }
 
 static void
@@ -69,9 +45,8 @@ pointer_leave(
     struct wl_pointer* _pointer,
     uint32_t serial,
     struct wl_surface* surface
-) { 
+) {
     struct playland_pointer* pointer = wl_pointer_get_user_data(_pointer);
-
     pointer->target_surface = NULL;
 }
 

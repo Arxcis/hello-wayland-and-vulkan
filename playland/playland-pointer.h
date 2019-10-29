@@ -5,8 +5,8 @@
 #include "./playland-window.h"
 
 enum playland_pointer_state {
-    PLAYLAND_POINTER_UP,
-    PLAYLAND_POINTER_DOWN,
+    PLAYLAND_POINTER_UP = 0,
+    PLAYLAND_POINTER_DOWN = 1,
 };
 
 typedef void (*playland_pointer_on_button_t)(struct playland_window*, uint32_t, uint32_t, enum playland_pointer_state);

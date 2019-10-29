@@ -1,4 +1,4 @@
-#include "./playland-file.h"
+#include "./playland-pool.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-struct playland_file*
-playland_file_create(struct playland* playland, const char* filepath) {
+struct playland_pool*
+playland_pool_create(struct playland* playland, const char* filepath) {
     struct stat stat;
 
     int fd = open(filepath, O_RDWR);
@@ -22,16 +22,15 @@ playland_file_create(struct playland* playland, const char* filepath) {
         return NULL;
     }
 
-    struct playland_file* file = malloc(sizeof(struct playland_file));
+    struct playland_pool* file = malloc(sizeof(struct playland_pool));
     if (file == NULL) {
         return NULL;
     }
 
     file->capacity = stat.st_size;
-    file->size = 0;
     file->fd = fd;
 
-    file->memory = mmap(0, file->capacity, PROT_READ, MAP_SHARED, file->fd, 0);
+    file->memory = mmap(NULL, file->capacity, PROT_READ, MAP_SHARED, file->fd, 0);
     if (file->memory == MAP_FAILED) {
         free(file);
         return NULL;
@@ -49,7 +48,7 @@ playland_file_create(struct playland* playland, const char* filepath) {
 }
 
 void
-playland_file_destroy(struct playland_file* file) {
+playland_pool_destroy(struct playland_pool* file) {
     wl_shm_pool_destroy(file->pool);
     munmap(file->memory, file->capacity);
     free(file);
@@ -57,8 +56,8 @@ playland_file_destroy(struct playland_file* file) {
 
 
 struct wl_buffer*
-playland_file_create_buffer(
-    struct playland_file* file,
+playland_pool_create_buffer(
+    struct playland_pool* file,
     const int32_t width,
     const int32_t height
 ) {
@@ -66,7 +65,7 @@ playland_file_create_buffer(
 
     struct wl_buffer* buffer = wl_shm_pool_create_buffer(
         file->pool,
-        file->size,
+        0,
         width,
         height,
         width*sizeof(pixel_t),
@@ -75,8 +74,6 @@ playland_file_create_buffer(
     if (buffer == NULL) {
         return NULL;
     }
-
-    file->size += width*height*sizeof(pixel_t);
 
     return buffer;
 }

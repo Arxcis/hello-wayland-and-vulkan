@@ -1,6 +1,7 @@
 #include "playland.h"
 #include "./playland-pointer.h"
 #include "./playland-keyboard.h"
+#include "../xdg/xdg.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -65,6 +66,7 @@ registry_global(
 ) {
     struct playland* const playland = data;
 
+
     if (strcmp(interface, wl_compositor_interface.name) == 0)
         playland->compositor = wl_registry_bind(
         	registry,
@@ -112,6 +114,14 @@ registry_global(
         	playland->pointer,
         	&pointer_listener,
             playland
+        );
+    }
+    else if (strcmp(interface, xdg_wm_base_interface.name) == 0) {
+        playland->xdg = wl_registry_bind(
+        	registry,
+        	name,
+            &wl_output_interface,
+            min(version, 2)
         );
     }
 }

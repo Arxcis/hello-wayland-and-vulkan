@@ -2,18 +2,15 @@
 #define PLAYLAND_WINDOW
 
 #include "./playland.h"
+#include "./playland-pool.h"
 
 struct playland_window {
     struct wl_shell_surface* shell_surface;
     struct wl_surface* surface;
     struct playland* playland;
+    struct playland_pool* pool;
+    struct wl_buffer* background;
 };
-
-void
-playland_window_set_background(
-    const struct playland_window* window,
-    struct wl_buffer* buffer
-);
 
 struct playland_window*
 playland_window_create(struct playland* playland, const char* title);
