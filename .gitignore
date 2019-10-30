@@ -1,6 +1,6 @@
-bin/*
-!bin/.gitkeep
 images.bin
-images/*
-!images/.gitkeep
 .DS_Store
+bin/*
+images/*
+xdg/*
+!*/**/.gitkeep
