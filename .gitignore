@@ -1,6 +1,5 @@
-images.bin
 .DS_Store
 bin/*
-images/*
 xdg/*
+wayland/*
 !*/**/.gitkeep
