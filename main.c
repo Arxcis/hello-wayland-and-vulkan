@@ -50,9 +50,14 @@ main(const int argc, const char** argv) {
         GOTO(free_playland);
     }
 
+    struct playland_window* const  window2 = playland_window_create(playland, "Playland");
+    if (! window2) {
+        GOTO(free_window);
+    }
+
     struct playland_pointer* const pointer = playland_pointer_create(playland);
     if (! pointer) {
-        GOTO(free_window);
+        GOTO(free_window2);
     }
     pointer->on_button = on_button;
 
@@ -74,6 +79,8 @@ main(const int argc, const char** argv) {
     free(keyboard);
 free_cursor:
     playland_pointer_destroy(pointer);
+free_window2:
+    playland_window_destroy(window2);
 free_window:
     playland_window_destroy(window);
 free_playland:
