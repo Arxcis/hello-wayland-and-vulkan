@@ -11,6 +11,7 @@ enum playland_keyboard_state {
 
 enum playland_keyboard_key {
     PLAYLAND_KEYBOARD_ESCAPE = 1,
+    PLAYLAND_KEYBOARD_Q = 16,
     PLAYLAND_KEYBOARD_F = 33,
     PLAYLAND_KEYBOARD_G = 34,
     PLAYLAND_KEYBOARD_M = 50,

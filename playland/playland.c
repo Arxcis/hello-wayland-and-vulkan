@@ -1,13 +1,15 @@
 #include "playland.h"
 #include "./playland-pointer.h"
 #include "./playland-keyboard.h"
-#include "../xdg/xdg-shell.h"
+#include "../xdg/xdg-shell-client.h"
 
 #include <string.h>
 #include <stdlib.h>
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
+
+static const struct xdg_wm_base_listener playland_base_listener;
 static const struct wl_registry_listener registry_listener;
 
 struct playland*
@@ -26,6 +28,7 @@ playland_create() {
         &registry_listener,
         playland
     );
+
     wl_display_roundtrip(playland->display);
     wl_registry_destroy(registry);
 
@@ -45,7 +48,6 @@ playland_destroy(struct playland* playland) {
 
     wl_pointer_destroy(playland->pointer);
     wl_seat_destroy(playland->seat);
-    wl_shell_destroy(playland->shell);
     wl_shm_destroy(playland->shm);
     wl_compositor_destroy(playland->compositor);
     wl_display_disconnect(playland->display);
@@ -66,35 +68,30 @@ registry_global(
 ) {
     struct playland* const playland = data;
 
-
-    if (strcmp(interface, wl_compositor_interface.name) == 0)
+    if (strcmp(interface, wl_compositor_interface.name) == 0) {
         playland->compositor = wl_registry_bind(
         	registry,
         	name,
             &wl_compositor_interface,
             min(version, 4)
         );
-    else if (strcmp(interface, wl_shm_interface.name) == 0)
+    }
+    else if (strcmp(interface, wl_shm_interface.name) == 0) {
         playland->shm = wl_registry_bind(
         	registry,
         	name,
             &wl_shm_interface,
             min(version, 1)
         );
-    else if (strcmp(interface, wl_shell_interface.name) == 0)
-        playland->shell = wl_registry_bind(
-        	registry,
-        	name,
-            &wl_shell_interface,
-            min(version, 1)
-        );
-    else if (strcmp(interface, wl_output_interface.name) == 0)
+    }
+    else if (strcmp(interface, wl_output_interface.name) == 0) {
         playland->output = wl_registry_bind(
         	registry,
         	name,
             &wl_output_interface,
             min(version, 2)
         );
+    }
     else if (strcmp(interface, wl_seat_interface.name) == 0) {
         playland->seat = wl_registry_bind(
         	registry,
@@ -120,9 +117,11 @@ registry_global(
         playland->xdg = wl_registry_bind(
         	registry,
         	name,
-            &wl_output_interface,
+            &xdg_wm_base_interface,
             min(version, 2)
         );
+
+        xdg_wm_base_add_listener(playland->xdg, &playland_base_listener, playland);
     }
 }
 
@@ -140,4 +139,15 @@ registry_listener = {
     .global_remove = registry_global_remove
 };
 
+void playland_base_ping(
+    void *data,
+	struct xdg_wm_base *base,
+	uint32_t serial
+) {
+    xdg_wm_base_pong(base, serial);
+}
 
+static const struct xdg_wm_base_listener
+playland_base_listener = {
+    .ping = playland_base_ping
+};

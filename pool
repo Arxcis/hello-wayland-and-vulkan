@@ -2,13 +2,14 @@
 
 WIDTH=2560
 HEIGHT=1440
+GOOGLE_BLUE=[0xf4, 0x85, 0x42, 255]
 
 bgra = []
 
 for w in range(WIDTH):
     for h in range(HEIGHT):
                 #0    0    0    a
-        bgra += [255, 255, 255, 255]
+        bgra += GOOGLE_BLUE
 
 buffer = b''.join([byte.to_bytes(1, byteorder='little') for byte in bgra])
 

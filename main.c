@@ -100,7 +100,7 @@ on_button(
 
     }
     else if (state == PLAYLAND_POINTER_DOWN) {
-        wl_shell_surface_move(target->shell_surface, target->playland->seat, serial);
+        xdg_toplevel_move(target->toplevel, target->playland->seat, serial);
     }
 }
 
@@ -114,24 +114,34 @@ on_key(
         return;
     }
 
-    if (key == PLAYLAND_KEYBOARD_ESCAPE) {
+    if (key == PLAYLAND_KEYBOARD_Q){
         quit = 1;
+        return;
     }
-    else if (key == PLAYLAND_KEYBOARD_F) {
-        wl_shell_surface_set_fullscreen(
-            target->shell_surface,
-            WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE,
-            120000,
-            target->playland->output
-        );
+
+    if (key == PLAYLAND_KEYBOARD_ESCAPE) {
+        xdg_toplevel_unset_fullscreen(target->toplevel);
+        return;
     }
-    else if (key == PLAYLAND_KEYBOARD_G) {
-        wl_shell_surface_set_toplevel(target->shell_surface);
+
+    if (key == PLAYLAND_KEYBOARD_F) {
+        if (target->is_fullscreen) {
+            xdg_toplevel_unset_fullscreen(target->toplevel);
+        }
+        else {
+            xdg_toplevel_set_fullscreen(target->toplevel, target->playland->output);
+        }
+        return;
     }
-    else if (key == PLAYLAND_KEYBOARD_M) {
-        wl_shell_surface_set_maximized(target->shell_surface, target->playland->output);
-    }
-    else if (key == PLAYLAND_KEYBOARD_N) {
-        wl_shell_surface_set_toplevel(target->shell_surface);
+
+
+    if (key == PLAYLAND_KEYBOARD_M) {
+        if (target->is_maximized) {
+            xdg_toplevel_set_minimized(target->toplevel);
+        }
+        else {
+            xdg_toplevel_set_maximized(target->toplevel);
+        }
+        return;
     }
 }

@@ -2,7 +2,7 @@
 #define PLAYLAND
 
 #include <wayland-client.h>
-#include "../xdg/xdg-shell.h"
+#include "../xdg/xdg-shell-client.h"
 #include <stdbool.h>
 
 struct playland {
@@ -15,7 +15,6 @@ struct playland {
     struct wl_display* display;
     struct wl_compositor* compositor;
     struct wl_seat* seat;
-    struct wl_shell* shell;
     struct wl_shm* shm;
     struct wl_pointer* pointer;
     struct wl_keyboard* keyboard;
