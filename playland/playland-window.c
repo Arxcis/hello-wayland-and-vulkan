@@ -1,7 +1,7 @@
 #include "./playland-window.h"
 #include "./playland-pool.h"
 #include <stdlib.h>
-#include "../xdg/xdg.h"
+#include "../xdg/xdg-shell.h"
 
 static const struct wl_shell_surface_listener
 playland_window_listener;

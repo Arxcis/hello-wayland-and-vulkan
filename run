@@ -1,4 +1,5 @@
 #!/usr/bin/sh
+set -e
 
 clear
 export WAYLAND_DEBUG=1
@@ -15,6 +16,7 @@ wayland-scanner \
     public-code \
     modules/wayland-protocols/stable/xdg-shell/xdg-shell.xml \
     xdg/xdg-shell-client.c
+
 
 #
 # Generate wayland-client.h and .c

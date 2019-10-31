@@ -2,7 +2,7 @@
 #define PLAYLAND
 
 #include <wayland-client.h>
-#include "../xdg/xdg.h"
+#include "../xdg/xdg-shell.h"
 #include <stdbool.h>
 
 struct playland {

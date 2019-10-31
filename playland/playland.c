@@ -1,7 +1,7 @@
 #include "playland.h"
 #include "./playland-pointer.h"
 #include "./playland-keyboard.h"
-#include "../xdg/xdg.h"
+#include "../xdg/xdg-shell.h"
 
 #include <string.h>
 #include <stdlib.h>
