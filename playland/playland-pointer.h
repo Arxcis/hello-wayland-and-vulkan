@@ -31,14 +31,6 @@ playland_pointer_create(struct playland_client* client);
 void
 playland_pointer_destroy(struct playland_pointer* pointer);
 
-void
-playland_pointer_set_cursor(
-    struct playland_pointer* const pointer,
-    struct wl_buffer* const cursor,
-    const int32_t hotspot_x,
-    const int32_t hotspot_y
-);
-
 extern const struct wl_pointer_listener
 playland_pointer_listener;
 

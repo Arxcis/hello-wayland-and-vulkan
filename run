@@ -25,12 +25,12 @@ wayland-scanner \
 wayland-scanner \
     client-header \
     modules/wayland/protocol/wayland.xml \
-    wayland/wayland-client.h
+    wayland/wayland-client-protocol.h
 
 wayland-scanner \
     public-code \
     modules/wayland/protocol/wayland.xml \
-    wayland/wayland-client.c
+    wayland/wayland-client-protocol.c
 
 #
 # Compile

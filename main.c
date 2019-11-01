@@ -101,6 +101,7 @@ on_button(
     else if (state == PLAYLAND_POINTER_DOWN) {
         xdg_toplevel_move(target->xtoplevel, target->client->seat, serial);
     }
+
 }
 
 void
@@ -113,7 +114,7 @@ on_key(
         return;
     }
 
-    if (key == PLAYLAND_KEYBOARD_Q){
+    if (key == PLAYLAND_KEYBOARD_Q) {
         quit = 1;
         return;
     }

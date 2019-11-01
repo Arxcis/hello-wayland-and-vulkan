@@ -16,17 +16,6 @@ playland_pointer_destroy(struct playland_pointer* pointer) {
     free(pointer);
 }
 
-
-void
-playland_pointer_set_cursor(
-    struct playland_pointer* const pointer,
-    struct wl_buffer* const cursor,
-    const int32_t hotspot_x,
-    const int32_t hotspot_y
-) {
-}
-
-
 static void
 pointer_enter(
     void* data,
@@ -86,6 +75,34 @@ pointer_axis(
     wl_fixed_t value
 ) { }
 
+static void
+pointer_axis_source(
+    void *data,
+	struct wl_pointer *wl_pointer,
+	uint32_t axis_source
+) { }
+
+static void
+pointer_axis_stop(
+    void *data,
+	struct wl_pointer *wl_pointer,
+	uint32_t time,
+    uint32_t axis
+) { }
+
+static void
+pointer_axis_discrete(
+    void *data,
+    struct wl_pointer *wl_pointer,
+    uint32_t axis,
+    int32_t discrete
+ ) { }
+
+static void
+pointer_frame(
+    void *data,
+	struct wl_pointer *wl_pointer
+) { }
 
 const struct wl_pointer_listener
 playland_pointer_listener = {
@@ -93,5 +110,9 @@ playland_pointer_listener = {
     .leave = pointer_leave,
     .motion = pointer_motion,
     .button = pointer_button,
-    .axis = pointer_axis
+    .axis = pointer_axis,
+    .axis_source = pointer_axis_source,
+    .axis_stop = pointer_axis_stop,
+    .axis_discrete = pointer_axis_discrete,
+    .frame = pointer_frame,
 };
