@@ -5,13 +5,12 @@
 #include <stdbool.h>
 #include <signal.h>
 
-#include "playland/playland.h"
+#include "playland/playland-client.h"
 #include "playland/playland-pool.h"
 #include "playland/playland-window.h"
 #include "playland/playland-pointer.h"
 #include "playland/playland-keyboard.h"
 
-static struct playland_client* playland = NULL;
 volatile sig_atomic_t quit = 0;
 
 int
@@ -41,26 +40,26 @@ main(const int argc, const char** argv) {
     //
     // 1. Initialize
     //
-    playland = playland_create();
-    if (! playland) {
+    struct playland_client* const client = playland_client_create;
+    if (! client) {
         GOTO(free_nothing);
     }
-    struct playland_window* const  window = playland_window_create(playland, "Playland");
+    struct playland_window* const  window = playland_window_create(client, "Playland");
     if (! window) {
         GOTO(free_playland);
     }
 
-    struct playland_window* const  window2 = playland_window_create(playland, "Playland Other");
+    struct playland_window* const  window2 = playland_window_create(client, "Playland Other");
     if (! window2) {
         GOTO(free_window);
     }
 
-    struct playland_pointer* const pointer = playland_pointer_create(playland);
+    struct playland_pointer* const pointer = playland_pointer_create(client);
     if (! pointer) {
         GOTO(free_window2);
     }
 
-    struct playland_keyboard* const keyboard = playland_keyboard_create(playland);
+    struct playland_keyboard* const keyboard = playland_keyboard_create(client);
     if (! keyboard) {
         GOTO(free_cursor);
     }
@@ -85,7 +84,7 @@ free_window2:
 free_window:
     playland_window_destroy(window);
 free_playland:
-    playland_destroy(playland);
+    playland_client_destroy(client);
 free_nothing:
     return status;
 }
