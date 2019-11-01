@@ -42,26 +42,21 @@ main(const int argc, const char** argv) {
     //
     struct playland_client* const client = playland_client_create();
     if (! client) {
-        GOTO(free_nothing);
+        GOTO(panic_client);
     }
     struct playland_window* const  window = playland_window_create(client, "Playland");
     if (! window) {
-        GOTO(free_playland);
-    }
-
-    struct playland_window* const  window2 = playland_window_create(client, "Playland Other");
-    if (! window2) {
-        GOTO(free_window);
+        GOTO(panic_window);
     }
 
     struct playland_pointer* const pointer = playland_pointer_create(client);
     if (! pointer) {
-        GOTO(free_window2);
+        GOTO(panic_pointer);
     }
 
     struct playland_keyboard* const keyboard = playland_keyboard_create(client);
     if (! keyboard) {
-        GOTO(free_cursor);
+        GOTO(panic_keyboard);
     }
 
     pointer->on_button = on_button;
@@ -77,15 +72,13 @@ main(const int argc, const char** argv) {
     // 3. Cleanup
     //
     playland_keyboard_destroy(keyboard);
-free_cursor:
+panic_keyboard:
     playland_pointer_destroy(pointer);
-free_window2:
-    playland_window_destroy(window2);
-free_window:
+panic_pointer:
     playland_window_destroy(window);
-free_playland:
+panic_window:
     playland_client_destroy(client);
-free_nothing:
+panic_client:
     return status;
 }
 
