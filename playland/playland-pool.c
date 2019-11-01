@@ -10,7 +10,7 @@
 #include <sys/mman.h>
 
 struct playland_pool*
-playland_pool_create(struct playland* playland, const char* filepath) {
+playland_pool_create(struct playland_client* client, const char* filepath) {
     struct stat stat;
 
     int fd = open(filepath, O_RDWR);
@@ -36,7 +36,7 @@ playland_pool_create(struct playland* playland, const char* filepath) {
         return NULL;
     }
 
-    file->pool = wl_shm_create_pool(playland->shm, file->fd, file->capacity);
+    file->pool = wl_shm_create_pool(client->shm, file->fd, file->capacity);
     if (file->pool == NULL) {
         munmap(file->memory, file->capacity);
         free(file);

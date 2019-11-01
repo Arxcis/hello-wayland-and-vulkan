@@ -1,20 +1,19 @@
-#include "playland.h"
-#include "./playland-pointer.h"
-#include "./playland-keyboard.h"
-#include "../xdg/xdg-shell-client.h"
-
 #include <string.h>
 #include <stdlib.h>
+#include "../xdg/xdg-shell-client.h"
+
+#include "playland-client.h"
+#include "playland-pointer.h"
+#include "playland-keyboard.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
-
-static const struct xdg_wm_base_listener playland_base_listener;
+static const struct xdg_wm_base_listener xdg_listener;
 static const struct wl_registry_listener registry_listener;
 
-struct playland*
-playland_create() {
-    struct playland* playland = malloc(sizeof(struct playland));
+struct playland_client*
+playland_client_create() {
+    struct playland_client* playland = malloc(sizeof(struct playland_client));
 
     playland->display = wl_display_connect(NULL);
     if (playland->display == NULL) {
@@ -36,7 +35,7 @@ playland_create() {
 }
 
 bool
-playland_listen(const struct playland* playland) {
+playland_client_listen(const struct playland_client* playland) {
     if (wl_display_dispatch(playland->display) < 0) {
         return true;
     }
@@ -44,7 +43,7 @@ playland_listen(const struct playland* playland) {
 }
 
 void
-playland_destroy(struct playland* playland) {
+playland_client_destroy(struct playland_client* playland) {
 
     wl_pointer_destroy(playland->pointer);
     wl_seat_destroy(playland->seat);
@@ -56,7 +55,7 @@ playland_destroy(struct playland* playland) {
 }
 
 //
-// Setup registry listeners
+// Listeners
 //
 static void
 registry_global(
@@ -66,7 +65,7 @@ registry_global(
     const char* interface,
     uint32_t version
 ) {
-    struct playland* const playland = data;
+    struct playland_client* const playland = data;
 
     if (strcmp(interface, wl_compositor_interface.name) == 0) {
         playland->compositor = wl_registry_bind(
@@ -121,7 +120,7 @@ registry_global(
             min(version, 2)
         );
 
-        xdg_wm_base_add_listener(playland->xdg, &playland_base_listener, playland);
+        xdg_wm_base_add_listener(playland->xdg,  xdg_listener, playland);
     }
 }
 
@@ -132,14 +131,13 @@ registry_global_remove(
     uint32_t c
 ) { }
 
-
 static const struct wl_registry_listener
 registry_listener = {
     .global = registry_global,
     .global_remove = registry_global_remove
 };
 
-void playland_base_ping(
+static void xdg_ping(
     void *data,
 	struct xdg_wm_base *base,
 	uint32_t serial
@@ -148,6 +146,6 @@ void playland_base_ping(
 }
 
 static const struct xdg_wm_base_listener
-playland_base_listener = {
-    .ping = playland_base_ping
+xdg_listener = {
+    .ping = xdg_ping
 };

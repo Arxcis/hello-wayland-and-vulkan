@@ -9,6 +9,7 @@
     "xdg.h": "c",
     "fcntl.h": "c",
     "stdbool.h": "c",
-    "stddef.h": "c"
+    "stddef.h": "c",
+    "playland-pointer.h": "c"
   }
 }

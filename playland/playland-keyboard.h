@@ -1,8 +1,8 @@
 #ifndef PLAYLAND_KEYBOARD
 #define PLAYLAND_KEYBOARD
 
-#include "./playland.h"
-#include "./playland-window.h"
+#include "playland-client.h
+#include "playland-window.h"
 
 enum playland_keyboard_state {
     PLAYLAND_KEYBOARD_STATE_UP = 0,
@@ -18,17 +18,22 @@ enum playland_keyboard_key {
     PLAYLAND_KEYBOARD_N = 49,
 };
 
-typedef void (*playland_keybaord_on_key_t)(struct playland_window*, enum playland_keyboard_key, enum playland_keyboard_state);
-
 struct playland_keyboard {
-    playland_keybaord_on_key_t on_key;
-    void* on_key_payload;
-    struct playland* playland;
     struct wl_surface* target;
+    struct playland_client* client;
+
+    void (*on_key)(
+        struct playland_window*,
+        enum playland_keyboard_key,
+        enum playland_keyboard_state
+    );
 };
 
 struct playland_keyboard*
-playland_keyboard_create(struct playland* playland);
+playland_keyboard_create(struct playland_client* client);
+
+void
+playland_keyboard_destroy(struct playland_keyboard* keyboard);
 
 extern const struct wl_keyboard_listener
 playland_keyboard_listener;

@@ -1,11 +1,12 @@
-#include "./playland-pointer.h"
+#include "playland-pointer.h"
 #include <stdlib.h>
 
 struct playland_pointer*
-playland_pointer_create(struct playland* playland) {
+playland_pointer_create(struct playland_client* client) {
     struct playland_pointer* pointer = malloc(sizeof(struct playland_pointer));
 
-    wl_pointer_set_user_data(playland->pointer, pointer);
+    wl_pointer_set_user_data(client->pointer, pointer);
+    pointer->client = client;
 
     return pointer;
 }
@@ -87,7 +88,7 @@ pointer_axis(
 
 
 const struct wl_pointer_listener
-pointer_listener = {
+playland_pointer_listener = {
     .enter = pointer_enter,
     .leave = pointer_leave,
     .motion = pointer_motion,

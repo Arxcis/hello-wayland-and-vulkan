@@ -2,14 +2,22 @@
 #include <stdlib.h>
 
 struct playland_keyboard*
-playland_keyboard_create(struct playland* playland)
+playland_keyboard_create(struct playland_client* client)
 {
     struct playland_keyboard* keyboard = malloc(sizeof(struct playland_keyboard));
+    if (keyboard == NULL) {
+        return NULL;
+    }
 
-    wl_keyboard_set_user_data(playland->keyboard, keyboard);
-	keyboard->playland = playland;
+    keyboard->client = client;
+    wl_keyboard_set_user_data(client->keyboard, keyboard);
 
     return keyboard;
+}
+
+void
+playland_keyboard_destroy(struct playland_keyboard* keyboard) {
+    free(keyboard);
 }
 
 static void

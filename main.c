@@ -5,13 +5,13 @@
 #include <stdbool.h>
 #include <signal.h>
 
-#include "./playland/playland.h"
-#include "./playland/playland-pool.h"
-#include "./playland/playland-window.h"
-#include "./playland/playland-pointer.h"
-#include "./playland/playland-keyboard.h"
+#include "playland/playland.h"
+#include "playland/playland-pool.h"
+#include "playland/playland-window.h"
+#include "playland/playland-pointer.h"
+#include "playland/playland-keyboard.h"
 
-static struct playland* playland = NULL;
+static struct playland_client* playland = NULL;
 volatile sig_atomic_t quit = 0;
 
 int
@@ -50,7 +50,7 @@ main(const int argc, const char** argv) {
         GOTO(free_playland);
     }
 
-    struct playland_window* const  window2 = playland_window_create(playland, "Playland");
+    struct playland_window* const  window2 = playland_window_create(playland, "Playland Other");
     if (! window2) {
         GOTO(free_window);
     }
@@ -59,12 +59,13 @@ main(const int argc, const char** argv) {
     if (! pointer) {
         GOTO(free_window2);
     }
-    pointer->on_button = on_button;
 
     struct playland_keyboard* const keyboard = playland_keyboard_create(playland);
     if (! keyboard) {
         GOTO(free_cursor);
     }
+
+    pointer->on_button = on_button;
     keyboard->on_key = on_key;
     //
     // 2. Loop
@@ -76,7 +77,7 @@ main(const int argc, const char** argv) {
     //
     // 3. Cleanup
     //
-    free(keyboard);
+    playland_keyboard_destroy(keyboard);
 free_cursor:
     playland_pointer_destroy(pointer);
 free_window2:
@@ -91,7 +92,6 @@ free_nothing:
 
 void
 signal_handler(int dummy) {
-
     perror("Quitting gracefully...\n");
     quit = 1;
 }
@@ -107,7 +107,7 @@ on_button(
 
     }
     else if (state == PLAYLAND_POINTER_DOWN) {
-        xdg_toplevel_move(target->toplevel, target->playland->seat, serial);
+        xdg_toplevel_move(target->xtoplevel, target->client->seat, serial);
     }
 }
 
@@ -127,27 +127,26 @@ on_key(
     }
 
     if (key == PLAYLAND_KEYBOARD_ESCAPE) {
-        xdg_toplevel_unset_fullscreen(target->toplevel);
+        xdg_toplevel_unset_fullscreen(target->xtoplevel);
         return;
     }
 
     if (key == PLAYLAND_KEYBOARD_F) {
         if (target->is_fullscreen) {
-            xdg_toplevel_unset_fullscreen(target->toplevel);
+            xdg_toplevel_unset_fullscreen(target->xtoplevel);
         }
         else {
-            xdg_toplevel_set_fullscreen(target->toplevel, target->playland->output);
+            xdg_toplevel_set_fullscreen(target->xtoplevel, target->client->output);
         }
         return;
     }
 
-
     if (key == PLAYLAND_KEYBOARD_M) {
         if (target->is_maximized) {
-            xdg_toplevel_set_minimized(target->toplevel);
+            xdg_toplevel_set_minimized(target->xtoplevel);
         }
         else {
-            xdg_toplevel_set_maximized(target->toplevel);
+            xdg_toplevel_set_maximized(target->xtoplevel);
         }
         return;
     }

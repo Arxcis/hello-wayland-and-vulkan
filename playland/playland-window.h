@@ -2,23 +2,24 @@
 #define PLAYLAND_WINDOW
 
 #include <stdbool.h>
-#include "./playland.h"
-#include "./playland-pool.h"
+
+#include "playland-client.h
+#include "playland-pool.h"
 
 struct playland_window {
-    struct xdg_toplevel* toplevel;
-    struct xdg_surface* shell;
     struct wl_surface* surface;
-    struct playland* playland;
-    struct playland_pool* pool;
     struct wl_buffer* background;
+    struct xdg_toplevel* xtoplevel;
+    struct xdg_surface* xsurface;
+    struct playland_pool* pool;
+    struct playland_client* client;
 
     bool is_fullscreen;
     bool is_maximized;
 };
 
 struct playland_window*
-playland_window_create(struct playland* playland, const char* title);
+playland_window_create(struct playland_client* client, const char* title);
 
 void
 playland_window_destroy(struct playland_window* window);

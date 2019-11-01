@@ -1,7 +1,7 @@
 #ifndef PLAYLAND_POOL
 #define PLAYLAND_POOL
 
-#include "./playland.h"
+#include "playland-client.h
 
 #define pixel_t uint32_t
 
@@ -13,7 +13,7 @@ struct playland_pool {
 };
 
 struct playland_pool*
-playland_pool_create(struct playland* playland, const char* filepath);
+playland_pool_create(struct playland_client* client, const char* filepath);
 
 void
 playland_pool_destroy(struct playland_pool* file);
