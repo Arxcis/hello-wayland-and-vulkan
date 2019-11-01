@@ -1,8 +1,8 @@
 #ifndef PLAYLAND_POINTER
 #define PLAYLAND_POINTER
 
-#include "playland-client.h
-#include "playland-window.h"
+#include "./playland-client.h"
+#include "./playland-window.h"
 
 enum playland_pointer_state {
     PLAYLAND_POINTER_UP = 0,

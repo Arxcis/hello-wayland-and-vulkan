@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include "../xdg/xdg-shell-client.h"
 
-#include "playland-client.h"
-#include "playland-pointer.h"
-#include "playland-keyboard.h"
+#include "./playland-client.h"
+#include "./playland-pointer.h"
+#include "./playland-keyboard.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
@@ -108,7 +108,7 @@ registry_global(
         );
         wl_pointer_add_listener(
         	playland->pointer,
-        	&pointer_listener,
+        	&playland_pointer_listener,
             playland
         );
     }
@@ -120,7 +120,7 @@ registry_global(
             min(version, 2)
         );
 
-        xdg_wm_base_add_listener(playland->xdg,  xdg_listener, playland);
+        xdg_wm_base_add_listener(playland->xdg,  &xdg_listener, playland);
     }
 }
 

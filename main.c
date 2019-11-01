@@ -40,7 +40,7 @@ main(const int argc, const char** argv) {
     //
     // 1. Initialize
     //
-    struct playland_client* const client = playland_client_create;
+    struct playland_client* const client = playland_client_create();
     if (! client) {
         GOTO(free_nothing);
     }
@@ -71,7 +71,7 @@ main(const int argc, const char** argv) {
     //
     bool done = false;
     while (! done && ! quit) {
-        done = playland_listen(playland);
+        done = playland_client_listen(client);
     }
     //
     // 3. Cleanup
@@ -142,7 +142,7 @@ on_key(
 
     if (key == PLAYLAND_KEYBOARD_M) {
         if (target->is_maximized) {
-            xdg_toplevel_set_minimized(target->xtoplevel);
+            xdg_toplevel_unset_maximized(target->xtoplevel);
         }
         else {
             xdg_toplevel_set_maximized(target->xtoplevel);

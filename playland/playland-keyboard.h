@@ -1,8 +1,8 @@
 #ifndef PLAYLAND_KEYBOARD
 #define PLAYLAND_KEYBOARD
 
-#include "playland-client.h
-#include "playland-window.h"
+#include "./playland-client.h"
+#include "./playland-window.h"
 
 enum playland_keyboard_state {
     PLAYLAND_KEYBOARD_STATE_UP = 0,

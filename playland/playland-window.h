@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-#include "playland-client.h
-#include "playland-pool.h"
+#include "./playland-client.h"
+#include "./playland-pool.h"
 
 struct playland_window {
     struct wl_surface* surface;
@@ -16,6 +16,7 @@ struct playland_window {
 
     bool is_fullscreen;
     bool is_maximized;
+    bool is_resizing;
 };
 
 struct playland_window*

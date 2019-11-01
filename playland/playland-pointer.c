@@ -1,4 +1,4 @@
-#include "playland-pointer.h"
+#include "./playland-pointer.h"
 #include <stdlib.h>
 
 struct playland_pointer*

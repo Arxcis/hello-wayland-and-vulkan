@@ -1,11 +1,14 @@
 #include <stdlib.h>
 #include "../xdg/xdg-shell-client.h"
 
-#include "playland-window.h"
-#include "playland-pool.h"
+#include "./playland-window.h"
+#include "./playland-pool.h"
 
 static const struct xdg_toplevel_listener
-toplevel_listener;
+xtoplevel_listener;
+
+static const struct xdg_surface_listener
+xsurface_listener;
 
 struct playland_window*
 playland_window_create(struct playland_client* client, const char* title) {
@@ -55,7 +58,8 @@ playland_window_create(struct playland_client* client, const char* title) {
     wl_surface_commit(surface);
 
     xdg_toplevel_set_title(xtoplevel, title);
-    xdg_toplevel_add_listener(xtoplevel, &toplevel_listener, 0);
+    xdg_surface_add_listener(xsurface, &xsurface_listener, 0);
+    xdg_toplevel_add_listener(xtoplevel, &xtoplevel_listener, 0);
 
     wl_surface_set_user_data(surface, window);
     xdg_toplevel_set_user_data(xtoplevel, window);
@@ -73,15 +77,37 @@ playland_window_destroy(struct playland_window* window) {
     free(window);
 }
 
-static void toplevel_configure(
+
+
+
+
+static void
+xsurface_configure(
+    void *data,
+    struct xdg_surface* xsurface,
+    uint32_t serial
+) {
+    struct playland_window* window = xdg_toplevel_get_user_data(xsurface);
+    xdg_surface_ack_configure(xsurface, serial);
+
+
+}
+
+
+static const struct xdg_surface_listener
+xsurface_listener = {
+    .configure = xsurface_configure
+};
+
+static void xtoplevel_configure(
     void* data,
-	struct xdg_toplevel* toplevel,
+	struct xdg_toplevel* xsurface,
 	int32_t width,
 	int32_t height,
 	struct wl_array* states
 ) {
-    const DEFAULT_WIDTH = 320;
-    const DEFAULT_HEIGHT = 200;
+    const uint32_t DEFAULT_WIDTH = 320;
+    const uint32_t DEFAULT_HEIGHT = 200;
 
     if (width == 0) {
         width = DEFAULT_WIDTH;
@@ -90,29 +116,36 @@ static void toplevel_configure(
         height = DEFAULT_HEIGHT;
     }
 
-    struct playland_window* window = xdg_toplevel_get_user_data(toplevel);
+    struct playland_window* window = xdg_toplevel_get_user_data(xsurface);
 
     struct wl_buffer* const background = playland_pool_create_buffer(window->pool, width, height);
     if (! background) {
         return;
     }
-
-    wl_surface_attach(window->surface, background, 0, 0);
-    xdg_surface_ack_configure(window->xsurface);
+    window->background = background;
+    wl_surface_attach(window->surface, window->background, 0, 0);
     wl_surface_commit(window->surface);
 
-    wl_buffer_destroy(window->background);
-    window->background = background;
+    // Reset state before each configuring event
+    window->is_fullscreen = false;
+    window->is_maximized = false;
+    window->is_resizing = false;
 
     uint32_t* it;
     wl_array_for_each(it, states) {
-        uint32_t state = *it;
-        window->is_fullscreen = state == XDG_TOPLEVEL_STATE_FULLSCREEN;
-        window->is_maximized = state == XDG_TOPLEVEL_STATE_MAXIMIZED;
+        if (*it == XDG_TOPLEVEL_STATE_RESIZING) {
+            window->is_resizing = true;
+        }
+        if (*it == XDG_TOPLEVEL_STATE_FULLSCREEN) {
+            window->is_fullscreen = true;
+        }
+        if (*it == XDG_TOPLEVEL_STATE_MAXIMIZED) {
+            window->is_maximized = true;
+        }
     }
 }
 
 static const struct xdg_toplevel_listener
-toplevel_listener = {
-    .configure = toplevel_configure,
+xtoplevel_listener = {
+    .configure = xtoplevel_configure,
 };
